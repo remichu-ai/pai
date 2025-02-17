@@ -10,13 +10,10 @@ struct ControlBar: View {
     // We injected these into the environment in VoiceAssistantApp.swift and ContentView.swift
     @EnvironmentObject private var tokenService: TokenService
     @EnvironmentObject private var room: Room
-    @Binding var isVideoEnabled: Bool
-    @Binding var videoTrack: LocalVideoTrack?
-    @Binding var audioTrack: LocalAudioTrack?
-    @Binding var videoPublication: LocalTrackPublication?
-    @Binding var audioPublication: LocalTrackPublication?
     
-    @State private var isAudioMuted: Bool = false
+    // initialize to false and connect function will turn it on upon start
+    @State private var isAudioEnabled: Bool = false
+    @Binding var isVideoEnabled: Bool
     
     // Private internal state
     @State private var isConnecting: Bool = false
@@ -53,13 +50,12 @@ struct ControlBar: View {
                     .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
             case .connected:
                 // When connected, show audio controls and disconnect button in segmented button-like group
-                // When connected, show audio controls and disconnect button in segmented button-like group
                 HStack(spacing: 2) {
-                    Button(action: toggleAudio) {
+                    Button(action: {toggleAudio(toggleMode: .toggle) }) {
                         Label {
-                            Text(isAudioMuted ? "Unmute" : "Mute")
+                            Text(isAudioEnabled ? "Mute" : "Unmute")
                         } icon: {
-                            Image(systemName: isAudioMuted ? "mic.slash" : "mic")
+                            Image(systemName: isAudioEnabled ? "mic" : "mic.slash")
                         }
                         .labelStyle(.iconOnly)
                         .frame(width: 44, height: 44)
@@ -120,8 +116,10 @@ struct ControlBar: View {
                 ) {
                     // Connect to the room and enable the microphone
                     try await room.connect(
-                        url: connectionDetails.serverUrl, token: connectionDetails.participantToken)
-                    try await room.localParticipant.setMicrophone(enabled: true)
+                        url: connectionDetails.serverUrl,
+                        token: connectionDetails.participantToken
+                    )
+                    try toggleAudio(toggleMode: .on)
                 } else {
                     print("Failed to fetch connection details")
                 }
@@ -142,99 +140,68 @@ struct ControlBar: View {
         }
     }
     
-    private func toggleAudio() {
+    enum ToggleMode: String {
+        case on = "on"
+        case off = "off"
+        case toggle = "toggle"
+    }
+    
+    private func toggleAudio(toggleMode: ToggleMode = .toggle) {
         Task {
-            if audioTrack == nil {
-                print("Audio track is nil, creating a new one...")
-                // If the audio track is nil, create and publish a new audio track
-                do {
-                    let newAudioTrack = LocalAudioTrack.createTrack(options: AudioCaptureOptions(
-                        echoCancellation: true,
-                        autoGainControl: true,
-                        noiseSuppression: true,
-                        highpassFilter: true
-                    ))
-                    audioTrack = newAudioTrack
-                    let publication = try await room.localParticipant.publish(
-                        audioTrack: newAudioTrack
-                    )
-                    audioPublication = publication as? LocalTrackPublication
-                    isAudioMuted = false // Track is unmuted by default
-                } catch {
-                    print("Failed to publish audio track: \(error)")
-                }
-            } else if let audioTrack = audioTrack {
-                print("Audio track is not nil, toggling mute state... Current isAudioMuted is: \(isAudioMuted)")
-                // If the audio track exists, toggle its mute state
-                if isAudioMuted {
-                    print("unmute")
-                    
-                    let audioCapturedOption = AudioCaptureOptions(
-                        echoCancellation: true,
-                        autoGainControl: true,
-                        noiseSuppression: true,
-                        highpassFilter: true
-                    )
-                    
-                    try await self.room.localParticipant.setMicrophone(enabled: true, captureOptions: audioCapturedOption)
-                    isAudioMuted = false
-                } else {
-                    print("mute")
-                    try await self.room.localParticipant.setMicrophone(enabled: false)
-                    isAudioMuted = true
-                }
-                
-                // Update the UI to reflect the new state
-                DispatchQueue.main.async {
-                    self.audioPublication = isAudioMuted ? nil : self.audioPublication
-                }
+            let captureOptions: AudioCaptureOptions = AudioCaptureOptions(
+                echoCancellation: true,
+                autoGainControl: true,
+                noiseSuppression: true,
+                highpassFilter: true
+            )
+            
+            if (isAudioEnabled==true && toggleMode == .on) || (isAudioEnabled==false && toggleMode == .off) {
+                print("audio is already in the targeted state")
+                return  // exit as no need to toggle
             }
+            
+            let targetMode = toggleMode == .toggle ? !isAudioEnabled : (toggleMode == .on)
+            print("target mode is \(targetMode)")
+            // toggle audio
+            try await self.room.localParticipant.setMicrophone(enabled: targetMode, captureOptions: captureOptions)
+            isAudioEnabled = targetMode
+            
+            print("toggle audio to \(isAudioEnabled ? "unmuted" : "muted")")
         }
     }
     
     private func toggleVideo() {
         Task {
-            if isVideoEnabled {
-                // Stop video and unpublish the video track
-                if let videoPublication = videoPublication as? LocalTrackPublication {
-                    do {
-                        try await room.localParticipant.unpublish(publication: videoPublication)
-                        self.videoPublication = nil
-                    } catch {
-                        print("Failed to unpublish video track: \(error)")
-                    }
-                }
-                isVideoEnabled = false
-            } else {
-                // Start video and publish the video track
-                if let videoTrack = videoTrack {
-                    do {
-                        // Create VideoPublishOptions with simulcast disabled
-                        let publishOptions = VideoPublishOptions(
-                            name: "video_track",
-                            encoding: nil,
-                            screenShareEncoding: nil,
-                            simulcast: false, // Disable simulcast here
-                            simulcastLayers: [],
-                            screenShareSimulcastLayers: [],
-                            preferredCodec: nil,
-                            preferredBackupCodec: nil,
-                            degradationPreference: .auto,
-                            streamName: nil
-                        )
-                        
-                        // Publish the video track with the custom publish options
-                        let publication = try await room.localParticipant.publish(
-                            videoTrack: videoTrack,
-                            options: publishOptions
-                        )
-                        videoPublication = publication as? LocalTrackPublication
-                    } catch {
-                        print("Failed to publish video track: \(error)")
-                    }
-                }
-                isVideoEnabled = true
-            }
+            let captureOptions = CameraCaptureOptions(
+                position: .back,
+                dimensions: .h1080_43,
+                fps: 24
+            )
+            
+            let publishOptions = VideoPublishOptions(
+                name: "video_track",
+                encoding: nil,
+                screenShareEncoding: nil,
+                simulcast: false, // Disable simulcast here
+                simulcastLayers: [],
+                screenShareSimulcastLayers: [],
+                preferredCodec: nil,
+                preferredBackupCodec: nil,
+                degradationPreference: .auto,
+                streamName: nil
+            )
+            
+            
+            // toggle video
+            try await self.room.localParticipant.setCamera(
+                enabled: !isVideoEnabled,
+                captureOptions: captureOptions,
+                publishOptions: publishOptions
+            )
+            isVideoEnabled = !isVideoEnabled
+            
+            print("toggle video to \(isVideoEnabled ? "enabled" : "disabled")")
+            
         }
     }
 }

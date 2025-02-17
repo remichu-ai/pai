@@ -6,10 +6,10 @@ import UIKit
 struct ContentView: View {
     @StateObject private var room = Room()
     @State private var isVideoEnabled: Bool = false
-    @State private var videoTrack: LocalVideoTrack?
-    @State private var audioTrack: LocalAudioTrack?
-    @State private var videoPublication: LocalTrackPublication?
-    @State private var audioPublication: LocalTrackPublication?
+//    @State private var videoTrack: LocalVideoTrack?
+//    @State private var audioTrack: LocalAudioTrack?
+//    @State private var videoPublication: LocalTrackPublication?
+//    @State private var audioPublication: LocalTrackPublication?
     @State private var serverUrl: String = "http://100.123.119.59:7880"
     @State private var showingSettings: Bool = false
     @EnvironmentObject var sessionConfigStore: SessionConfigStore
@@ -48,11 +48,7 @@ struct ContentView: View {
                     .frame(maxWidth: 512)
                 
                 ControlBar(
-                    isVideoEnabled: $isVideoEnabled,
-                    videoTrack: $videoTrack,
-                    audioTrack: $audioTrack,
-                    videoPublication: $videoPublication,
-                    audioPublication: $audioPublication
+                    isVideoEnabled: $isVideoEnabled
                 )
             }
             .padding()
@@ -61,33 +57,12 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity) // Ensure the entire view fills the screen
         .environmentObject(room)
         .onAppear {
-            initializeTracks()
         }
         .sheet(isPresented: $showingSettings) {
             SettingView(
                 serverUrl: $serverUrl,
                 sessionConfig: $sessionConfigStore.sessionConfig
             )
-        }
-    }
-
-    
-    private func initializeTracks() {
-        do {
-            videoTrack = try LocalVideoTrack.createCameraTrack(options: CameraCaptureOptions(
-                position: .back,
-                dimensions: .h1080_43,
-                fps: 24
-            ))
-            
-            audioTrack = LocalAudioTrack.createTrack(options: AudioCaptureOptions(
-                echoCancellation: true,
-                autoGainControl: true,
-                noiseSuppression: true,
-                highpassFilter: true
-            ))
-        } catch {
-            print("Failed to create tracks: \(error)")
         }
     }
 }

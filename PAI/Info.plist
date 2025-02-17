@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Access to camera to stream video</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Access to microphone to stream audio</string>
 	<key>LiveKitSandboxId</key>
 	<string>$(LIVEKIT_SANDBOX_ID)</string>
 	<key>CFBundleIdentifier</key>
@@ -11,8 +15,8 @@
 		<string>Audio</string>
 		<string>audio</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>Access to camera for streaming</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

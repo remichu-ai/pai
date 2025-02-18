@@ -14,6 +14,7 @@ struct ControlBar: View {
     // initialize to false and connect function will turn it on upon start
     @State private var isAudioEnabled: Bool = false
     @Binding var isVideoEnabled: Bool
+    @State private var isScreenSharingEnabled: Bool = false
     
     // Private internal state
     @State private var isConnecting: Bool = false
@@ -67,7 +68,7 @@ struct ControlBar: View {
                         .frame(height: 44)
                         .id(room.localParticipant.firstAudioTrack?.id ?? "no-track") // Force re-render when the track changes
                     
-                    Button(action: toggleVideo) {
+                    Button(action: {toggleVideo(toggleMode: .toggle) }) {
                         Label {
                             Text(isVideoEnabled ? "Stop Video" : "Start Video")
                         } icon: {
@@ -78,6 +79,18 @@ struct ControlBar: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    
+                    Button(action: { toggleScreenShare(toggleMode: .toggle) }) {
+                            Label {
+                                Text(isScreenSharingEnabled ? "Stop Screen Share" : "Start Screen Share")
+                            } icon: {
+                                Image(systemName: isScreenSharingEnabled ? "rectangle.on.rectangle" : "rectangle.on.rectangle.slash")
+                            }
+                            .labelStyle(.iconOnly)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
                 }
                 .background(.primary.opacity(0.1))
                 .cornerRadius(8)
@@ -137,6 +150,13 @@ struct ControlBar: View {
             isDisconnecting = true
             await room.disconnect()
             isDisconnecting = false
+            
+            // Reset the flags to false
+            isAudioEnabled = false
+            isVideoEnabled = false
+            isScreenSharingEnabled = false
+            
+            isDisconnecting = false
         }
     }
     
@@ -170,7 +190,7 @@ struct ControlBar: View {
         }
     }
     
-    private func toggleVideo() {
+    private func toggleVideo(toggleMode: ToggleMode = .toggle) {
         Task {
             let captureOptions = CameraCaptureOptions(
                 position: .back,
@@ -191,17 +211,40 @@ struct ControlBar: View {
                 streamName: nil
             )
             
+            // Determine the target mode based on the toggleMode
+            let targetMode = toggleMode == .toggle ? !isVideoEnabled : (toggleMode == .on)
             
-            // toggle video
+            // Check if the video is already in the targeted state
+            if (isVideoEnabled && toggleMode == .on) || (!isVideoEnabled && toggleMode == .off) {
+                print("video is already in the targeted state")
+                return  // exit as no need to toggle
+            }
+            
+            // Toggle video
             try await self.room.localParticipant.setCamera(
-                enabled: !isVideoEnabled,
+                enabled: targetMode,
                 captureOptions: captureOptions,
                 publishOptions: publishOptions
             )
-            isVideoEnabled = !isVideoEnabled
+            isVideoEnabled = targetMode
             
             print("toggle video to \(isVideoEnabled ? "enabled" : "disabled")")
+        }
+    }
+    
+    private func toggleScreenShare(toggleMode: ToggleMode = .toggle) {
+        Task {
+            // Ensure video is turned off before starting screen share
+//            if isVideoEnabled {
+//                try await toggleVideo(toggleMode: .off)
+//            }
             
+            // Determine the target mode based on the toggleMode
+            let targetMode = toggleMode == .toggle ? !isScreenSharingEnabled : (toggleMode == .on)
+
+            try await self.room.localParticipant.setScreenShare(enabled: targetMode)
+            isScreenSharingEnabled = targetMode
+            print("Screen sharing toggled to \(isScreenSharingEnabled ? "enabled" : "disabled")")
         }
     }
 }

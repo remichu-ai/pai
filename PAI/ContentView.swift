@@ -5,6 +5,7 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var room = Room()
+    
     @State private var isVideoEnabled: Bool = false
 //    @State private var videoTrack: LocalVideoTrack?
 //    @State private var audioTrack: LocalAudioTrack?
@@ -63,6 +64,13 @@ struct ContentView: View {
                 serverUrl: $serverUrl,
                 sessionConfig: $sessionConfigStore.sessionConfig
             )
+            .onDisappear {
+                // Send the updated session config to the backend
+                sendSessionConfigToBackend(
+                    sessionConfigStore.sessionConfig,
+                    serverUrl: serverUrl
+                )
+            }
         }
     }
 }

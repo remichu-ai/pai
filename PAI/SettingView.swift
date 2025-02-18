@@ -49,7 +49,17 @@ struct SettingView: View {
                     set: { sessionConfig.model = $0.isEmpty ? nil : $0 }
                 ))
                 
-                TextField("User Interrupt Token", text: $sessionConfig.userInterruptToken)
+                HStack {
+                    // Label on the left
+                    Text("Interrupt Token:")
+                        .font(.body)
+                        .foregroundColor(.primary)
+                    
+                    // Text input box on the right
+                    TextField("Enter token", text: $sessionConfig.userInterruptToken)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.default)
+                }
                 
                 Picker("Tool Instruction Position", selection: $sessionConfig.toolInstructionPosition) {
                     Text("Prefix").tag("prefix")
@@ -63,15 +73,33 @@ struct SettingView: View {
             }
             
             Section(header: Text("Modalities")) {
-                ForEach($sessionConfig.modalities, id: \.self) { $modality in
-                    Picker("Modality", selection: $modality) {
-                        Text("Text").tag("text")
-                        Text("Audio").tag("audio")
+                // Toggle for "text" modality
+                Toggle("Text", isOn: Binding(
+                    get: { sessionConfig.modalities.contains("text") },
+                    set: { isOn in
+                        if isOn {
+                            if !sessionConfig.modalities.contains("text") {
+                                sessionConfig.modalities.append("text")
+                            }
+                        } else {
+                            sessionConfig.modalities.removeAll { $0 == "text" }
+                        }
                     }
-                }
-                Button("Add Modality") {
-                    sessionConfig.modalities.append("text")
-                }
+                ))
+                
+                // Toggle for "audio" modality
+                Toggle("Audio", isOn: Binding(
+                    get: { sessionConfig.modalities.contains("audio") },
+                    set: { isOn in
+                        if isOn {
+                            if !sessionConfig.modalities.contains("audio") {
+                                sessionConfig.modalities.append("audio")
+                            }
+                        } else {
+                            sessionConfig.modalities.removeAll { $0 == "audio" }
+                        }
+                    }
+                ))
             }
             
             Section(header: Text("Tools")) {

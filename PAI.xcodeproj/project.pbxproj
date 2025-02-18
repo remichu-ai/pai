@@ -9,10 +9,39 @@
 /* Begin PBXBuildFile section */
 		FE09A3512D634B0F00F94248 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A3502D634B0F00F94248 /* LiveKit */; };
 		FE09A3542D634B3900F94248 /* LiveKitComponents in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A3532D634B3900F94248 /* LiveKitComponents */; };
+		FE09A4382D63935F00F94248 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE09A4372D63935F00F94248 /* ReplayKit.framework */; };
+		FE09A43F2D63935F00F94248 /* BroadcastExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE09A4352D63935F00F94248 /* BroadcastExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FE09A4472D63965100F94248 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A4462D63965100F94248 /* LiveKit */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FE09A43D2D63935F00F94248 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE09A31A2D6346AC00F94248 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE09A4342D63935F00F94248;
+			remoteInfo = BroadcastExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FE09A4402D63935F00F94248 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FE09A43F2D63935F00F94248 /* BroadcastExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		FE09A3222D6346AC00F94248 /* PAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE09A4352D63935F00F94248 /* BroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE09A4372D63935F00F94248 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -23,6 +52,13 @@
 			);
 			target = FE09A3212D6346AC00F94248 /* PAI */;
 		};
+		FE09A4442D63935F00F94248 /* Exceptions for "BroadcastExtension" folder in "BroadcastExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FE09A4342D63935F00F94248 /* BroadcastExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +68,14 @@
 				FE09A3E62D63884200F94248 /* Exceptions for "PAI" folder in "PAI" target */,
 			);
 			path = PAI;
+			sourceTree = "<group>";
+		};
+		FE09A4392D63935F00F94248 /* BroadcastExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FE09A4442D63935F00F94248 /* Exceptions for "BroadcastExtension" folder in "BroadcastExtension" target */,
+			);
+			path = BroadcastExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -46,6 +90,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FE09A4322D63935F00F94248 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE09A4382D63935F00F94248 /* ReplayKit.framework in Frameworks */,
+				FE09A4472D63965100F94248 /* LiveKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -53,6 +106,8 @@
 			isa = PBXGroup;
 			children = (
 				FE09A3242D6346AC00F94248 /* PAI */,
+				FE09A4392D63935F00F94248 /* BroadcastExtension */,
+				FE09A4362D63935F00F94248 /* Frameworks */,
 				FE09A3232D6346AC00F94248 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,8 +116,17 @@
 			isa = PBXGroup;
 			children = (
 				FE09A3222D6346AC00F94248 /* PAI.app */,
+				FE09A4352D63935F00F94248 /* BroadcastExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		FE09A4362D63935F00F94248 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FE09A4372D63935F00F94248 /* ReplayKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -75,10 +139,12 @@
 				FE09A31E2D6346AC00F94248 /* Sources */,
 				FE09A31F2D6346AC00F94248 /* Frameworks */,
 				FE09A3202D6346AC00F94248 /* Resources */,
+				FE09A4402D63935F00F94248 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				FE09A43E2D63935F00F94248 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FE09A3242D6346AC00F94248 /* PAI */,
@@ -92,6 +158,29 @@
 			productReference = FE09A3222D6346AC00F94248 /* PAI.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FE09A4342D63935F00F94248 /* BroadcastExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE09A4432D63935F00F94248 /* Build configuration list for PBXNativeTarget "BroadcastExtension" */;
+			buildPhases = (
+				FE09A4312D63935F00F94248 /* Sources */,
+				FE09A4322D63935F00F94248 /* Frameworks */,
+				FE09A4332D63935F00F94248 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FE09A4392D63935F00F94248 /* BroadcastExtension */,
+			);
+			name = BroadcastExtension;
+			packageProductDependencies = (
+				FE09A4462D63965100F94248 /* LiveKit */,
+			);
+			productName = BroadcastExtension;
+			productReference = FE09A4352D63935F00F94248 /* BroadcastExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -103,6 +192,9 @@
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					FE09A3212D6346AC00F94248 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					FE09A4342D63935F00F94248 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -126,12 +218,20 @@
 			projectRoot = "";
 			targets = (
 				FE09A3212D6346AC00F94248 /* PAI */,
+				FE09A4342D63935F00F94248 /* BroadcastExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		FE09A3202D6346AC00F94248 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE09A4332D63935F00F94248 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -148,7 +248,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FE09A4312D63935F00F94248 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE09A43E2D63935F00F94248 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FE09A4342D63935F00F94248 /* BroadcastExtension */;
+			targetProxy = FE09A43D2D63935F00F94248 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		FE09A32F2D6346AC00F94248 /* Debug */ = {
@@ -279,8 +394,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PAI/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Access to camera to stream video";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Access to microphone to stream audio";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -319,8 +437,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PAI/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Access to camera to stream video";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Access to microphone to stream audio";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -345,6 +466,67 @@
 			};
 			name = Release;
 		};
+		FE09A4412D63935F00F94248 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BroadcastExtension/BroadcastExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2X2T57M7JB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BroadcastExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI.broadcast;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		FE09A4422D63935F00F94248 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BroadcastExtension/BroadcastExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2X2T57M7JB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BroadcastExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI.broadcast;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -362,6 +544,15 @@
 			buildConfigurations = (
 				FE09A3322D6346AC00F94248 /* Debug */,
 				FE09A3332D6346AC00F94248 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE09A4432D63935F00F94248 /* Build configuration list for PBXNativeTarget "BroadcastExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE09A4412D63935F00F94248 /* Debug */,
+				FE09A4422D63935F00F94248 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -397,6 +588,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FE09A3522D634B3900F94248 /* XCRemoteSwiftPackageReference "components-swift" */;
 			productName = LiveKitComponents;
+		};
+		FE09A4462D63965100F94248 /* LiveKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE09A34F2D634B0F00F94248 /* XCRemoteSwiftPackageReference "client-sdk-swift" */;
+			productName = LiveKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

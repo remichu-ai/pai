@@ -1,6 +1,6 @@
 import Foundation
 
-struct TurnDetectionConfig {
+struct TurnDetectionConfig: Encodable {
     var type: String = "server_vad"
     var threshold: Double = 0.5
     var prefixPaddingMs: Int = 300

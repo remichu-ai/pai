@@ -1,6 +1,6 @@
 import Foundation
 
-struct SessionConfig {
+struct SessionConfig: Encodable {
     var modalities: [String] = ["text", "audio"]
     var instructions: String = ""
     var voice: String?

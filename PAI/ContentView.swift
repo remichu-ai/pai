@@ -4,7 +4,7 @@ import UIKit
 
 
 struct ContentView: View {
-    @StateObject private var room = Room()
+//    @StateObject private var room = Room()
     
     @State private var isVideoEnabled: Bool = false
 //    @State private var videoTrack: LocalVideoTrack?
@@ -15,7 +15,15 @@ struct ContentView: View {
     @State private var showingSettings: Bool = false
     @EnvironmentObject var sessionConfigStore: SessionConfigStore
     
-    init() { }
+    
+    @StateObject private var room: Room
+    private var transcriptionDelegate = TranscriptionDelegate()
+
+    init() {
+        let delegate = TranscriptionDelegate()
+        _room = StateObject(wrappedValue: Room(delegate: delegate))
+        self.transcriptionDelegate = delegate
+    }
     
     var body: some View {
         VStack(spacing: 0) { // Use VStack as the main container
@@ -47,6 +55,10 @@ struct ContentView: View {
                 StatusView()
                     .frame(height: 256)
                     .frame(maxWidth: 512)
+                
+                // Add transcription display
+                TranscriptionView(delegate: transcriptionDelegate)
+                    .padding()
                 
                 ControlBar(
                     isVideoEnabled: $isVideoEnabled

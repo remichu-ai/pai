@@ -4,20 +4,15 @@ import UIKit
 
 
 struct ContentView: View {
-//    @StateObject private var room = Room()
-    
-    @State private var isVideoEnabled: Bool = false
-//    @State private var videoTrack: LocalVideoTrack?
-//    @State private var audioTrack: LocalAudioTrack?
-//    @State private var videoPublication: LocalTrackPublication?
-//    @State private var audioPublication: LocalTrackPublication?
-    @State private var serverUrl: String = "http://100.123.119.59:7880"
-    @State private var showingSettings: Bool = false
-    @EnvironmentObject var sessionConfigStore: SessionConfigStore
-    
-    
     @StateObject private var room: Room
     private var transcriptionDelegate = TranscriptionDelegate()
+    
+    @State private var isVideoEnabled: Bool = false
+    @State private var serverUrl: String = "http://100.123.119.59:7880"
+    @State private var showingSettings: Bool = false
+    @State private var isTranscriptVisible: Bool = false
+    @EnvironmentObject var sessionConfigStore: SessionConfigStore
+    
 
     init() {
         let delegate = TranscriptionDelegate()
@@ -30,6 +25,12 @@ struct ContentView: View {
             // Top bar with settings button
             HStack {
                 Spacer() // Push the button to the right
+                
+                if isVideoEnabled {
+                    MiniStatusView()
+//                        .padding(.leading, 16)
+                }
+                
                 Button(action: { showingSettings.toggle() }) {
                     Image(systemName: "gear")
                         .font(.system(size: 20))
@@ -37,10 +38,13 @@ struct ContentView: View {
                         .frame(width: 44, height: 44)
                         .background(Color("ButtonBackgroundColor"))
                         .clipShape(Circle())
-                }
-                .padding([.top, .trailing], 16)
+                }.padding(.trailing, 16)
+
             }
             .frame(maxWidth: .infinity) // Ensure the HStack takes full width
+            .padding(.top, 4)     // less top padding
+            .padding(.bottom, 4) // more bottom padding
+            
             
             // Main content
             VStack(spacing: 24) {
@@ -50,18 +54,21 @@ struct ContentView: View {
                         .aspectRatio(3 / 4, contentMode: .fit)
                         .frame(maxWidth: .infinity)
                         .frame(maxHeight: .infinity)
+                } else {
+                    
+                    StatusView()
+                        .frame(height: 256)
+                        .frame(maxWidth: 512)
                 }
                 
-                StatusView()
-                    .frame(height: 256)
-                    .frame(maxWidth: 512)
-                
-                // Add transcription display
-                TranscriptionView(delegate: transcriptionDelegate)
-                    .padding()
+                // Conditionally display the transcript view
+                if isTranscriptVisible {
+                    TranscriptionView(delegate: transcriptionDelegate)
+                }
                 
                 ControlBar(
-                    isVideoEnabled: $isVideoEnabled
+                    isVideoEnabled: $isVideoEnabled,
+                    isTranscriptVisible: $isTranscriptVisible
                 )
             }
             .padding()
@@ -80,7 +87,7 @@ struct ContentView: View {
                 // Send the updated session config to the backend
                 sendSessionConfigToBackend(
                     sessionConfigStore.sessionConfig,
-                    serverUrl: serverUrl
+                    room: room
                 )
             }
         }

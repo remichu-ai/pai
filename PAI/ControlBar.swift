@@ -14,13 +14,16 @@ struct ControlBar: View {
     // initialize to false and connect function will turn it on upon start
     @State private var isAudioEnabled: Bool = false
     @Binding var isVideoEnabled: Bool
+    @Binding var isTranscriptVisible: Bool
     @State private var isScreenSharingEnabled: Bool = false
     
     // Private internal state
     @State private var isConnecting: Bool = false
     @State private var isDisconnecting: Bool = false
 
-
+    let width: CGFloat = 60
+    let height: CGFloat = 60
+    let fontSize: CGFloat = 24
     
     // Namespace for view transitions
     @Namespace private var animation
@@ -59,13 +62,13 @@ struct ControlBar: View {
                             Image(systemName: isAudioEnabled ? "mic" : "mic.slash")
                         }
                         .labelStyle(.iconOnly)
-                        .frame(width: 44, height: 44)
+                        .frame(width: width, height: height)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     
                     LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
-                        .frame(height: 44)
+                        .frame(height: height)
                         .id(room.localParticipant.firstAudioTrack?.id ?? "no-track") // Force re-render when the track changes
                     
                     Button(action: {toggleVideo(toggleMode: .toggle) }) {
@@ -75,19 +78,33 @@ struct ControlBar: View {
                             Image(systemName: isVideoEnabled ? "video" : "video.slash")
                         }
                         .labelStyle(.iconOnly)
-                        .frame(width: 44, height: 44)
+                        .frame(width: width, height: height)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     
                     Button(action: { toggleScreenShare(toggleMode: .toggle) }) {
+                        Label {
+                            Text(isScreenSharingEnabled ? "Stop Screen Share" : "Start Screen Share")
+                        } icon: {
+                            Image(systemName: isScreenSharingEnabled ? "rectangle.on.rectangle" : "rectangle.on.rectangle.slash")
+                        }
+                        .labelStyle(.iconOnly)
+                        .frame(width: width, height: height)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: {
+                            isTranscriptVisible.toggle()
+                        }) {
                             Label {
-                                Text(isScreenSharingEnabled ? "Stop Screen Share" : "Start Screen Share")
+                                Text(isTranscriptVisible ? "Hide Transcript" : "Show Transcript")
                             } icon: {
-                                Image(systemName: isScreenSharingEnabled ? "rectangle.on.rectangle" : "rectangle.on.rectangle.slash")
+                                Image(systemName: "doc.text")
                             }
                             .labelStyle(.iconOnly)
-                            .frame(width: 44, height: 44)
+                            .frame(width: width, height: height)
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)

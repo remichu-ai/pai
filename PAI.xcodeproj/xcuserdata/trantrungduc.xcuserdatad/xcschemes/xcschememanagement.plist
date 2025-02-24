@@ -4,15 +4,28 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>BroadcastExtension.xcscheme_^#shared#^_</key>
+		<key>PAI.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>PAI.xcscheme_^#shared#^_</key>
+		<key>broadcast.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>FE09A3212D6346AC00F94248</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FE28BCAA2D6B627A003AD5A2</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

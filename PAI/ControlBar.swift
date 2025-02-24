@@ -8,8 +8,11 @@ import SwiftUI
 struct ControlBar: View {
 
     // We injected these into the environment in VoiceAssistantApp.swift and ContentView.swift
-    @EnvironmentObject private var tokenService: TokenService
+//    @EnvironmentObject private var tokenService: TokenService
     @EnvironmentObject private var room: Room
+    
+    // A callback that is invoked when the user taps the connect button.
+    var onStartConversation: () -> Void
     
     // initialize to false and connect function will turn it on upon start
     @State private var isAudioEnabled: Bool = false
@@ -50,7 +53,8 @@ struct ControlBar: View {
 
             switch currentConfiguration {
             case .disconnected:
-                ConnectButton(connectAction: connect)
+                // using call back function
+                ConnectButton(connectAction: onStartConversation)
                     .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
             case .connected:
                 // When connected, show audio controls and disconnect button in segmented button-like group
@@ -125,42 +129,6 @@ struct ControlBar: View {
         .animation(.spring(duration: 0.3), value: currentConfiguration)
     }
 
-    /// Fetches a token and connects to the LiveKit room
-    /// This assumes the agent is running and is configured to automatically join new rooms
-    private func connect() {
-        Task {
-            isConnecting = true
-
-            // Generate a random room name to ensure a new room is created
-            // In a production app, you may want a more reliable process for ensuring agent dispatch
-            let roomName = "room-\(Int.random(in: 1000 ... 9999))"
-
-            // For this demo, we'll use a random participant name as well. you may want to use user IDs in a production app
-            let participantName = "user-\(Int.random(in: 1000 ... 9999))"
-
-            do {
-                // Fetch connection details from token service
-                if let connectionDetails = try await tokenService.fetchConnectionDetails(
-                    roomName: roomName,
-                    participantName: participantName
-                ) {
-                    // Connect to the room and enable the microphone
-                    try await room.connect(
-                        url: connectionDetails.serverUrl,
-                        token: connectionDetails.participantToken
-                    )
-                    try toggleAudio(toggleMode: .on)
-                } else {
-                    print("Failed to fetch connection details")
-                }
-                isConnecting = false
-            } catch {
-                print("Connection error: \(error)")
-                isConnecting = false
-            }
-        }
-    }
-
     /// Disconnects from the current LiveKit room
     private func disconnect() {
         Task {
@@ -172,6 +140,7 @@ struct ControlBar: View {
             isAudioEnabled = false
             isVideoEnabled = false
             isScreenSharingEnabled = false
+            isTranscriptVisible = false
             
             isDisconnecting = false
         }

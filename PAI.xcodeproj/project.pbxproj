@@ -9,18 +9,18 @@
 /* Begin PBXBuildFile section */
 		FE09A3512D634B0F00F94248 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A3502D634B0F00F94248 /* LiveKit */; };
 		FE09A3542D634B3900F94248 /* LiveKitComponents in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A3532D634B3900F94248 /* LiveKitComponents */; };
-		FE09A4382D63935F00F94248 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE09A4372D63935F00F94248 /* ReplayKit.framework */; };
-		FE09A43F2D63935F00F94248 /* BroadcastExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE09A4352D63935F00F94248 /* BroadcastExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		FE09A4472D63965100F94248 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A4462D63965100F94248 /* LiveKit */; };
+		FE28BCEE2D6B73F0003AD5A2 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE09A4372D63935F00F94248 /* ReplayKit.framework */; };
+		FE28BCF52D6B73F0003AD5A2 /* broadcast.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FE28BCFD2D6B76F7003AD5A2 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE28BCFC2D6B76F7003AD5A2 /* LiveKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FE09A43D2D63935F00F94248 /* PBXContainerItemProxy */ = {
+		FE28BCF32D6B73F0003AD5A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FE09A31A2D6346AC00F94248 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = FE09A4342D63935F00F94248;
-			remoteInfo = BroadcastExtension;
+			remoteGlobalIDString = FE28BCEC2D6B73F0003AD5A2;
+			remoteInfo = broadcast;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -31,7 +31,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				FE09A43F2D63935F00F94248 /* BroadcastExtension.appex in Embed Foundation Extensions */,
+				FE28BCF52D6B73F0003AD5A2 /* broadcast.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,8 +40,8 @@
 
 /* Begin PBXFileReference section */
 		FE09A3222D6346AC00F94248 /* PAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		FE09A4352D63935F00F94248 /* BroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE09A4372D63935F00F94248 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = broadcast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,12 +52,12 @@
 			);
 			target = FE09A3212D6346AC00F94248 /* PAI */;
 		};
-		FE09A4442D63935F00F94248 /* Exceptions for "BroadcastExtension" folder in "BroadcastExtension" target */ = {
+		FE28BCF92D6B73F0003AD5A2 /* Exceptions for "broadcast" folder in "broadcast" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = FE09A4342D63935F00F94248 /* BroadcastExtension */;
+			target = FE28BCEC2D6B73F0003AD5A2 /* broadcast */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -70,12 +70,12 @@
 			path = PAI;
 			sourceTree = "<group>";
 		};
-		FE09A4392D63935F00F94248 /* BroadcastExtension */ = {
+		FE28BCEF2D6B73F0003AD5A2 /* broadcast */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				FE09A4442D63935F00F94248 /* Exceptions for "BroadcastExtension" folder in "BroadcastExtension" target */,
+				FE28BCF92D6B73F0003AD5A2 /* Exceptions for "broadcast" folder in "broadcast" target */,
 			);
-			path = BroadcastExtension;
+			path = broadcast;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -90,12 +90,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE09A4322D63935F00F94248 /* Frameworks */ = {
+		FE28BCEA2D6B73F0003AD5A2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FE09A4382D63935F00F94248 /* ReplayKit.framework in Frameworks */,
-				FE09A4472D63965100F94248 /* LiveKit in Frameworks */,
+				FE28BCEE2D6B73F0003AD5A2 /* ReplayKit.framework in Frameworks */,
+				FE28BCFD2D6B76F7003AD5A2 /* LiveKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,7 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				FE09A3242D6346AC00F94248 /* PAI */,
-				FE09A4392D63935F00F94248 /* BroadcastExtension */,
+				FE28BCEF2D6B73F0003AD5A2 /* broadcast */,
 				FE09A4362D63935F00F94248 /* Frameworks */,
 				FE09A3232D6346AC00F94248 /* Products */,
 			);
@@ -116,7 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				FE09A3222D6346AC00F94248 /* PAI.app */,
-				FE09A4352D63935F00F94248 /* BroadcastExtension.appex */,
+				FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,7 +144,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				FE09A43E2D63935F00F94248 /* PBXTargetDependency */,
+				FE28BCF42D6B73F0003AD5A2 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FE09A3242D6346AC00F94248 /* PAI */,
@@ -158,27 +158,27 @@
 			productReference = FE09A3222D6346AC00F94248 /* PAI.app */;
 			productType = "com.apple.product-type.application";
 		};
-		FE09A4342D63935F00F94248 /* BroadcastExtension */ = {
+		FE28BCEC2D6B73F0003AD5A2 /* broadcast */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FE09A4432D63935F00F94248 /* Build configuration list for PBXNativeTarget "BroadcastExtension" */;
+			buildConfigurationList = FE28BCF62D6B73F0003AD5A2 /* Build configuration list for PBXNativeTarget "broadcast" */;
 			buildPhases = (
-				FE09A4312D63935F00F94248 /* Sources */,
-				FE09A4322D63935F00F94248 /* Frameworks */,
-				FE09A4332D63935F00F94248 /* Resources */,
+				FE28BCE92D6B73F0003AD5A2 /* Sources */,
+				FE28BCEA2D6B73F0003AD5A2 /* Frameworks */,
+				FE28BCEB2D6B73F0003AD5A2 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				FE09A4392D63935F00F94248 /* BroadcastExtension */,
+				FE28BCEF2D6B73F0003AD5A2 /* broadcast */,
 			);
-			name = BroadcastExtension;
+			name = broadcast;
 			packageProductDependencies = (
-				FE09A4462D63965100F94248 /* LiveKit */,
+				FE28BCFC2D6B76F7003AD5A2 /* LiveKit */,
 			);
-			productName = BroadcastExtension;
-			productReference = FE09A4352D63935F00F94248 /* BroadcastExtension.appex */;
+			productName = broadcast;
+			productReference = FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -194,7 +194,7 @@
 					FE09A3212D6346AC00F94248 = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					FE09A4342D63935F00F94248 = {
+					FE28BCEC2D6B73F0003AD5A2 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -218,7 +218,7 @@
 			projectRoot = "";
 			targets = (
 				FE09A3212D6346AC00F94248 /* PAI */,
-				FE09A4342D63935F00F94248 /* BroadcastExtension */,
+				FE28BCEC2D6B73F0003AD5A2 /* broadcast */,
 			);
 		};
 /* End PBXProject section */
@@ -231,7 +231,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE09A4332D63935F00F94248 /* Resources */ = {
+		FE28BCEB2D6B73F0003AD5A2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -248,7 +248,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE09A4312D63935F00F94248 /* Sources */ = {
+		FE28BCE92D6B73F0003AD5A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -258,10 +258,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FE09A43E2D63935F00F94248 /* PBXTargetDependency */ = {
+		FE28BCF42D6B73F0003AD5A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FE09A4342D63935F00F94248 /* BroadcastExtension */;
-			targetProxy = FE09A43D2D63935F00F94248 /* PBXContainerItemProxy */;
+			target = FE28BCEC2D6B73F0003AD5A2 /* broadcast */;
+			targetProxy = FE28BCF32D6B73F0003AD5A2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -321,7 +321,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -415,10 +415,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Debug;
@@ -428,7 +429,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = PAI/PAI.entitlements;
+				CODE_SIGN_ENTITLEMENTS = PAI/PAIRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PAI/Preview Content\"";
@@ -458,25 +459,27 @@
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;
 		};
-		FE09A4412D63935F00F94248 /* Debug */ = {
+		FE28BCF72D6B73F0003AD5A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = BroadcastExtension/BroadcastExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = broadcast/broadcastRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2X2T57M7JB;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BroadcastExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_FILE = broadcast/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = broadcast;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -485,28 +488,27 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI.broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = xros;
+				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				XROS_DEPLOYMENT_TARGET = 2.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		FE09A4422D63935F00F94248 /* Release */ = {
+		FE28BCF82D6B73F0003AD5A2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = BroadcastExtension/BroadcastExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = broadcast/broadcastRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2X2T57M7JB;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BroadcastExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_FILE = broadcast/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = broadcast;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -515,15 +517,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI.broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = xros;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;
 		};
@@ -548,11 +548,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FE09A4432D63935F00F94248 /* Build configuration list for PBXNativeTarget "BroadcastExtension" */ = {
+		FE28BCF62D6B73F0003AD5A2 /* Build configuration list for PBXNativeTarget "broadcast" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FE09A4412D63935F00F94248 /* Debug */,
-				FE09A4422D63935F00F94248 /* Release */,
+				FE28BCF72D6B73F0003AD5A2 /* Debug */,
+				FE28BCF82D6B73F0003AD5A2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -589,7 +589,7 @@
 			package = FE09A3522D634B3900F94248 /* XCRemoteSwiftPackageReference "components-swift" */;
 			productName = LiveKitComponents;
 		};
-		FE09A4462D63965100F94248 /* LiveKit */ = {
+		FE28BCFC2D6B76F7003AD5A2 /* LiveKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FE09A34F2D634B0F00F94248 /* XCRemoteSwiftPackageReference "client-sdk-swift" */;
 			productName = LiveKit;

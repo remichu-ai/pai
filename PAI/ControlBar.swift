@@ -15,9 +15,10 @@ struct ControlBar: View {
     var onStartConversation: () -> Void
     
     // initialize to false and connect function will turn it on upon start
-    @State private var isAudioEnabled: Bool = false
+    @Binding var isAudioEnabled: Bool
     @Binding var isVideoEnabled: Bool
     @Binding var isTranscriptVisible: Bool
+    @Binding var isHoldToTalk: Bool
     @State private var isScreenSharingEnabled: Bool = false
     
     // Private internal state
@@ -48,60 +49,71 @@ struct ControlBar: View {
     }
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack {
             Spacer()
-
             switch currentConfiguration {
             case .disconnected:
-                // using call back function
                 ConnectButton(connectAction: onStartConversation)
                     .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
             case .connected:
-                // When connected, show audio controls and disconnect button in segmented button-like group
-                HStack(spacing: 2) {
-                    Button(action: {toggleAudio(toggleMode: .toggle) }) {
-                        Label {
-                            Text(isAudioEnabled ? "Mute" : "Unmute")
-                        } icon: {
-                            Image(systemName: isAudioEnabled ? "mic" : "mic.slash")
-                        }
-                        .labelStyle(.iconOnly)
-                        .frame(width: width, height: height)
-                        .contentShape(Rectangle())
+                // Create a two-row layout using VStack
+                VStack(spacing: 8) {
+                    // --- First Row: HandFree toggle + audio visualizer ---
+                    HStack {
+
+                        Spacer()
+                        // Hand-free toggle (you can adjust the vertical flag as needed)
+                        HoldToTalkView(isHoldToTalk: $isHoldToTalk, vertical: false)
                     }
-                    .buttonStyle(.plain)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+//                    .background(Color.primary.opacity(0.1))
+//                    .cornerRadius(8)
                     
-                    LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
-                        .frame(height: height)
-                        .id(room.localParticipant.firstAudioTrack?.id ?? "no-track") // Force re-render when the track changes
-                    
-                    Button(action: {toggleVideo(toggleMode: .toggle) }) {
-                        Label {
-                            Text(isVideoEnabled ? "Stop Video" : "Start Video")
-                        } icon: {
-                            Image(systemName: isVideoEnabled ? "video" : "video.slash")
+                    // --- Second Row: Other control buttons ---
+                    HStack(spacing: 2) {
+                        Button(action: { toggleAudio(toggleMode: .toggle) }) {
+                            Label {
+                                Text(isAudioEnabled ? "Mute" : "Unmute")
+                            } icon: {
+                                Image(systemName: isAudioEnabled ? "mic" : "mic.slash")
+                            }
+                            .labelStyle(.iconOnly)
+                            .frame(width: width, height: height)
+                            .contentShape(Rectangle())
                         }
-                        .labelStyle(.iconOnly)
-                        .frame(width: width, height: height)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: { toggleScreenShare(toggleMode: .toggle) }) {
-                        Label {
-                            Text(isScreenSharingEnabled ? "Stop Screen Share" : "Start Screen Share")
-                        } icon: {
-                            Image(systemName: isScreenSharingEnabled ? "rectangle.on.rectangle" : "rectangle.on.rectangle.slash")
+                        
+                        .buttonStyle(.plain)
+                        // Moved audio visualizer:
+                        LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
+                            .frame(height: height)
+                            .id(room.localParticipant.firstAudioTrack?.id ?? "no-track")
+                        
+                        Button(action: { toggleVideo(toggleMode: .toggle) }) {
+                            Label {
+                                Text(isVideoEnabled ? "Stop Video" : "Start Video")
+                            } icon: {
+                                Image(systemName: isVideoEnabled ? "video" : "video.slash")
+                            }
+                            .labelStyle(.iconOnly)
+                            .frame(width: width, height: height)
+                            .contentShape(Rectangle())
                         }
-                        .labelStyle(.iconOnly)
-                        .frame(width: width, height: height)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: {
-                            isTranscriptVisible.toggle()
-                        }) {
+                        .buttonStyle(.plain)
+                        
+                        Button(action: { toggleScreenShare(toggleMode: .toggle) }) {
+                            Label {
+                                Text(isScreenSharingEnabled ? "Stop Screen Share" : "Start Screen Share")
+                            } icon: {
+                                Image(systemName: isScreenSharingEnabled ? "rectangle.on.rectangle" : "rectangle.on.rectangle.slash")
+                            }
+                            .labelStyle(.iconOnly)
+                            .frame(width: width, height: height)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Button(action: { isTranscriptVisible.toggle() }) {
                             Label {
                                 Text(isTranscriptVisible ? "Hide Transcript" : "Show Transcript")
                             } icon: {
@@ -112,21 +124,25 @@ struct ControlBar: View {
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        // Disconnect button remains on the right
+                        DisconnectButton(disconnectAction: disconnect)
+                            .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color("ButtonBackgroundColor"))
+                    .cornerRadius(8)
                 }
-                .background(.primary.opacity(0.1))
-                .cornerRadius(8)
-                
-                DisconnectButton(disconnectAction: disconnect)
-                    .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
-                
             case .transitioning:
                 TransitionButton(isConnecting: isConnecting)
                     .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
             }
-
             Spacer()
         }
-        .animation(.spring(duration: 0.3), value: currentConfiguration)
+        .animation(.spring(duration: 0.1), value: currentConfiguration)
     }
 
     /// Disconnects from the current LiveKit room
@@ -274,9 +290,10 @@ private struct ConnectButton: View {
     var body: some View {
         Button(action: connectAction) {
             Text("Start a Conversation")
+                .font(.system(size:22))
 //                .textCase(.uppercase)
-                .frame(height: 44)
-                .padding(.horizontal, 16)
+                .frame(height: 50)
+                .padding(.horizontal, 18)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

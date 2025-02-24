@@ -2,65 +2,42 @@ import LiveKit
 import SwiftUI
 import UIKit
 
-
 struct ContentView: View {
     @StateObject private var room: Room
     private var transcriptionDelegate = TranscriptionDelegate()
     
     @State private var isVideoEnabled: Bool = false
-    // Use @AppStorage so that serverUrl persists between app launches
-    // http://100.123.119.59:7880
+    @State private var isAudioEnabled: Bool = false
     @AppStorage("serverUrl") private var serverUrl: String = ""
     @EnvironmentObject private var tokenService: TokenService
 
     @State private var showingSettings: Bool = false
     @State private var showingToolSettings: Bool = false
-    // Alert to warn if the server URL is missing
     @State private var showingMissingUrlAlert: Bool = false
     @State private var isTranscriptVisible: Bool = false
     @EnvironmentObject var sessionConfigStore: SessionConfigStore
     
+    // New state for hand-free mode (default on)
+    @State private var isHoldToTalk: Bool = true
 
     init() {
         let delegate = TranscriptionDelegate()
-        // Create custom screenshare options with broadcast extension enabled
-//        let customScreenShareOptions = ScreenShareCaptureOptions(useBroadcastExtension: true)
-//        // Create custom room options with the custom screenshare options
-//        let customRoomOptions = RoomOptions(
-//            defaultCameraCaptureOptions: CameraCaptureOptions(),
-//            defaultScreenShareCaptureOptions: customScreenShareOptions,
-//            defaultAudioCaptureOptions: AudioCaptureOptions(),
-//            defaultVideoPublishOptions: VideoPublishOptions(),
-//            defaultAudioPublishOptions: AudioPublishOptions(),
-//            defaultDataPublishOptions: DataPublishOptions(),
-//            adaptiveStream: false,
-//            dynacast: false,
-//            stopLocalTrackOnUnpublish: true,
-//            suspendLocalVideoTracksInBackground: true,
-//            e2eeOptions: nil,
-//            reportRemoteTrackStatistics: false
-//        )
-//        
         _room = StateObject(wrappedValue: Room(delegate: delegate))
         self.transcriptionDelegate = delegate
     }
     
-    
     var body: some View {
-        VStack(spacing: 0) { // Use VStack as the main container
-            // Top bar with settings button
+        VStack(spacing: 0) {
+            // Top bar with only settings (removed hand-free toggle here)
             HStack {
-                Spacer() // Push the button to the right
-                
+                Spacer()
                 if isVideoEnabled {
                     MiniStatusView()
-//                        .padding(.leading, 16)
                 }
                 
-                // tool setting button
                 if room.connectionState == .connected {
                     Button(action: { showingToolSettings.toggle() }) {
-                        Image(systemName: "wrench") // Using a wrench icon for tools
+                        Image(systemName: "wrench")
                             .font(.system(size: 20))
                             .foregroundColor(Color("ButtonColor"))
                             .frame(width: 44, height: 44)
@@ -77,49 +54,71 @@ struct ContentView: View {
                         .frame(width: 44, height: 44)
                         .background(Color("ButtonBackgroundColor"))
                         .clipShape(Circle())
-                }.padding(.trailing, 16)
-
+                }
+                .padding(.trailing, 16)
             }
-            .frame(maxWidth: .infinity) // Ensure the HStack takes full width
-            .padding(.top, 4)     // less top padding
-            .padding(.bottom, 4) // more bottom padding
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
             
-            
-            // Main content
+            // Main content area
             VStack(spacing: 24) {
-                // Display the local participant's camera feed if video is enabled
+                // Video/Status and transcript views
                 if isVideoEnabled {
                     LocalParticipantView()
                         .aspectRatio(3 / 4, contentMode: .fit)
                         .frame(maxWidth: .infinity)
                         .frame(maxHeight: .infinity)
                 } else {
-                    
-                StatusView()
-                    .frame(height: 256)
-                    .frame(maxWidth: 512)
+                    StatusView()
+                        .frame(height: 256)
+                        .frame(maxWidth: 512)
                 }
                 
-                // Conditionally display the transcript view
+                if room.connectionState == .connected {
+                    Spacer() // Pushes everything below to the bottom
+                }
+
                 if isTranscriptVisible {
                     TranscriptionView(delegate: transcriptionDelegate)
                 }
-                
-                // Pass a callback (onStartConversation) to the control bar so that before starting
-                // a conversation the serverUrl is checked.
-                ControlBar(
-                    onStartConversation: startConversation,
-                    isVideoEnabled: $isVideoEnabled,
-                    isTranscriptVisible: $isTranscriptVisible
-                    
-                )
+
+                if room.connectionState == .connected {
+                    HStack {
+                        ControlBar(
+                            onStartConversation: startConversation,
+                            isAudioEnabled: $isAudioEnabled,
+                            isVideoEnabled: $isVideoEnabled,
+                            isTranscriptVisible: $isTranscriptVisible,
+                            isHoldToTalk: $isHoldToTalk
+                        )
+                    }
+                        
+                } else {
+                    VStack(spacing: 8) {
+                        
+                        ControlBar(
+                            onStartConversation: startConversation,
+                            isAudioEnabled: $isAudioEnabled,
+                            isVideoEnabled: $isVideoEnabled,
+                            isTranscriptVisible: $isTranscriptVisible,
+                            isHoldToTalk: $isHoldToTalk
+                        )
+                        
+                        HoldToTalkView(isHoldToTalk: $isHoldToTalk)
+                    }
+                }
             }
             .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity) // Expand to fill remaining space
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity) // Ensure the entire view fills the screen
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .environmentObject(room)
         .onAppear {
+            // Any additional onAppear logic
+        }
+        .onChange(of: isHoldToTalk) { newValue in
+            sessionConfigStore.sessionConfig.turnDetection.createResponse = newValue
+            sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
         }
         .sheet(isPresented: $showingSettings) {
             SettingView(
@@ -127,11 +126,7 @@ struct ContentView: View {
                 sessionConfig: $sessionConfigStore.sessionConfig
             )
             .onDisappear {
-                // Send the updated session config to the backend
-                sendSessionConfigToBackend(
-                    sessionConfigStore.sessionConfig,
-                    room: room
-                )
+                sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
             }
         }
         .sheet(isPresented: $showingToolSettings) {
@@ -150,17 +145,12 @@ struct ContentView: View {
     }
     
     private func startConversation() {
-        // Check that the server URL is not empty (or not just whitespace)
         if serverUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             showingMissingUrlAlert = true
             return
         }
         
-        // If the URL is set, proceed with connection logic.
-        // For example, you might call a connection method on your room or tokenService.
-        // You can reuse your existing logic here:
         Task {
-            // Generate random room and participant names (or use your own logic)
             let roomName = "room-\(Int.random(in: 1000 ... 9999))"
             let participantName = "user-\(Int.random(in: 1000 ... 9999))"
             
@@ -178,12 +168,18 @@ struct ContentView: View {
                             )
                         )
                     )
-                    try await room.localParticipant.setMicrophone(enabled: true, captureOptions: AudioCaptureOptions(
-                        echoCancellation: true,
-                        autoGainControl: true,
-                        noiseSuppression: true,
-                        highpassFilter: true
-                    ))
+                    // start audio live stream if Hold-to-Talk not selected
+                    if isHoldToTalk==false {
+                        try await room.localParticipant.setMicrophone(enabled: true, captureOptions: AudioCaptureOptions(
+                            echoCancellation: true,
+                            autoGainControl: true,
+                            noiseSuppression: true,
+                            highpassFilter: true
+                        ))
+                        isAudioEnabled=true
+                    } else{
+                        isAudioEnabled=false
+                    }
                 } else {
                     print("Failed to fetch connection details")
                 }
@@ -197,28 +193,25 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(Room())
-        .environmentObject(SessionConfigStore()) // Add this line
+        .environmentObject(SessionConfigStore())
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        // Default state
         ContentView()
             .environmentObject(Room())
-            .environmentObject(SessionConfigStore()) // Add this line
+            .environmentObject(SessionConfigStore())
             .previewDisplayName("Default State")
         
-        // Dark mode preview
         ContentView()
             .environmentObject(Room())
-            .environmentObject(SessionConfigStore()) // Add this line
+            .environmentObject(SessionConfigStore())
             .preferredColorScheme(.dark)
             .previewDisplayName("Dark Mode")
         
-        // iPad Pro preview
         ContentView()
             .environmentObject(Room())
-            .environmentObject(SessionConfigStore()) // Add this line
+            .environmentObject(SessionConfigStore())
             .previewDevice(PreviewDevice(rawValue: "iPad Pro (12.9-inch)"))
             .previewDisplayName("iPad Pro")
     }

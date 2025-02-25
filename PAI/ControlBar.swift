@@ -6,34 +6,27 @@ import SwiftUI
 /// The ControlBar component handles connection, disconnection, and audio controls
 /// You can customize this component to fit your app's needs
 struct ControlBar: View {
-
-    // We injected these into the environment in VoiceAssistantApp.swift and ContentView.swift
-//    @EnvironmentObject private var tokenService: TokenService
     @EnvironmentObject private var room: Room
     
-    // A callback that is invoked when the user taps the connect button.
+    // Callback when the connect button is tapped.
     var onStartConversation: () -> Void
     
-    // initialize to false and connect function will turn it on upon start
     @Binding var isAudioEnabled: Bool
     @Binding var isVideoEnabled: Bool
     @Binding var isTranscriptVisible: Bool
     @Binding var isHoldToTalk: Bool
-    @State private var isScreenSharingEnabled: Bool = false
     
-    // Private internal state
+    @State private var isScreenSharingEnabled: Bool = false
     @State private var isConnecting: Bool = false
     @State private var isDisconnecting: Bool = false
 
-    let width: CGFloat = 60
-    let height: CGFloat = 60
-    let fontSize: CGFloat = 24
-    
-    // Namespace for view transitions
+    // Updated size constants for larger, touch-friendly buttons
+    let width: CGFloat = 70
+    let height: CGFloat = 70
+    let fontSize: CGFloat = 28
+
     @Namespace private var animation
 
-
-    // These are the overall configurations for this component, based on current app state
     private enum Configuration {
         case disconnected, connected, transitioning
     }
@@ -56,84 +49,75 @@ struct ControlBar: View {
                 ConnectButton(connectAction: onStartConversation)
                     .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
             case .connected:
-                // Create a two-row layout using VStack
+                // Use a two-row layout:
                 VStack(spacing: 8) {
-                    // --- First Row: HandFree toggle + audio visualizer ---
-                    HStack {
-
-                        Spacer()
-                        // Hand-free toggle (you can adjust the vertical flag as needed)
-                        HoldToTalkView(isHoldToTalk: $isHoldToTalk, vertical: false)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-//                    .background(Color.primary.opacity(0.1))
-//                    .cornerRadius(8)
-                    
-                    // --- Second Row: Other control buttons ---
-                    HStack(spacing: 2) {
-                        Button(action: { toggleAudio(toggleMode: .toggle) }) {
-                            Label {
-                                Text(isAudioEnabled ? "Mute" : "Unmute")
-                            } icon: {
-                                Image(systemName: isAudioEnabled ? "mic" : "mic.slash")
-                            }
-                            .labelStyle(.iconOnly)
-                            .frame(width: width, height: height)
-                            .contentShape(Rectangle())
-                        }
-                        
-                        .buttonStyle(.plain)
-                        // Moved audio visualizer:
+                    // --- First Row: Hold-to-Talk and Audio Visualizer ---
+                    HStack(spacing: 8) {
+                        // Moved audio visualizer here:
                         LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
                             .frame(height: height)
                             .id(room.localParticipant.firstAudioTrack?.id ?? "no-track")
-                        
-                        Button(action: { toggleVideo(toggleMode: .toggle) }) {
-                            Label {
-                                Text(isVideoEnabled ? "Stop Video" : "Start Video")
-                            } icon: {
-                                Image(systemName: isVideoEnabled ? "video" : "video.slash")
-                            }
-                            .labelStyle(.iconOnly)
-                            .frame(width: width, height: height)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Button(action: { toggleScreenShare(toggleMode: .toggle) }) {
-                            Label {
-                                Text(isScreenSharingEnabled ? "Stop Screen Share" : "Start Screen Share")
-                            } icon: {
-                                Image(systemName: isScreenSharingEnabled ? "rectangle.on.rectangle" : "rectangle.on.rectangle.slash")
-                            }
-                            .labelStyle(.iconOnly)
-                            .frame(width: width, height: height)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Button(action: { isTranscriptVisible.toggle() }) {
-                            Label {
-                                Text(isTranscriptVisible ? "Hide Transcript" : "Show Transcript")
-                            } icon: {
-                                Image(systemName: "doc.text")
-                            }
-                            .labelStyle(.iconOnly)
-                            .frame(width: width, height: height)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        
                         Spacer()
-                        
-                        // Disconnect button remains on the right
-                        DisconnectButton(disconnectAction: disconnect)
+                        // Hold-to-Talk toggle
+                        HoldToTalkView(isHoldToTalk: $isHoldToTalk, vertical: false)
+                    }
+//                    .padding(.horizontal, 50)
+//                    .padding(.vertical, 4)
+                    
+                    // --- Second Row: Other control buttons ---
+                    HStack(spacing: 12) {
+                        RoundIconButton(
+                                systemImageName: isAudioEnabled ? "mic" : "mic.slash",
+                                action: { toggleAudio(toggleMode: .toggle) },
+                                size: width,
+                                fontSize: fontSize,
+                                backgroundColor: isAudioEnabled ? .green : .gray,
+                                foregroundColor: .white
+                            )
+
+                            RoundIconButton(
+                                systemImageName: isVideoEnabled ? "video" : "video.slash",
+                                action: { toggleVideo(toggleMode: .toggle) },
+                                size: width,
+                                fontSize: fontSize,
+                                backgroundColor: isVideoEnabled ? .blue : .gray,
+                                foregroundColor: .white
+                            )
+
+                            RoundIconButton(
+                                systemImageName: isScreenSharingEnabled
+                                    ? "rectangle.on.rectangle"
+                                    : "rectangle.on.rectangle.slash",
+                                action: { toggleScreenShare(toggleMode: .toggle) },
+                                size: width,
+                                fontSize: fontSize,
+                                backgroundColor: isScreenSharingEnabled ? .blue : .gray,
+                                foregroundColor: .white
+                            )
+
+                            RoundIconButton(
+                                systemImageName: "doc.text",
+                                action: { isTranscriptVisible.toggle() },
+                                size: width,
+                                fontSize: fontSize,
+                                backgroundColor: isTranscriptVisible ? .blue : .gray,
+                                foregroundColor: .white
+                            )
+
+//                            Spacer()
+
+                            // The new round disconnect button
+                            DisconnectButton(
+                                disconnectAction: disconnect,
+                                width: width,
+                                height: height,
+                                fontSize: fontSize
+                            )
                             .matchedGeometryEffect(id: "main-button", in: animation, properties: .position)
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color("ButtonBackgroundColor"))
+//                    .padding(.horizontal, 50)
+//                    .padding(.vertical, 4)
+//                    .background(Color("ButtonBackgroundColor"))
                     .cornerRadius(8)
                 }
             case .transitioning:
@@ -142,22 +126,28 @@ struct ControlBar: View {
             }
             Spacer()
         }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 8)
+        .background(
+            Color(.systemGray6) // Or .ultraThinMaterial for a blurred look
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .animation(.spring(duration: 0.1), value: currentConfiguration)
     }
 
-    /// Disconnects from the current LiveKit room
+    /// Disconnects from the current LiveKit room.
     private func disconnect() {
         Task {
             isDisconnecting = true
             await room.disconnect()
             isDisconnecting = false
-            
-            // Reset the flags to false
+
+            // Reset flags.
             isAudioEnabled = false
             isVideoEnabled = false
             isScreenSharingEnabled = false
             isTranscriptVisible = false
-            
+
             isDisconnecting = false
         }
     }
@@ -170,24 +160,22 @@ struct ControlBar: View {
     
     private func toggleAudio(toggleMode: ToggleMode = .toggle) {
         Task {
-            let captureOptions: AudioCaptureOptions = AudioCaptureOptions(
+            let captureOptions = AudioCaptureOptions(
                 echoCancellation: true,
                 autoGainControl: true,
                 noiseSuppression: true,
                 highpassFilter: true
             )
             
-            if (isAudioEnabled==true && toggleMode == .on) || (isAudioEnabled==false && toggleMode == .off) {
+            if (isAudioEnabled && toggleMode == .on) || (!isAudioEnabled && toggleMode == .off) {
                 print("audio is already in the targeted state")
-                return  // exit as no need to toggle
+                return
             }
             
             let targetMode = toggleMode == .toggle ? !isAudioEnabled : (toggleMode == .on)
             print("target mode is \(targetMode)")
-            // toggle audio
             try await self.room.localParticipant.setMicrophone(enabled: targetMode, captureOptions: captureOptions)
             isAudioEnabled = targetMode
-            
             print("toggle audio to \(isAudioEnabled ? "unmuted" : "muted")")
         }
     }
@@ -204,7 +192,7 @@ struct ControlBar: View {
                 name: "video_track",
                 encoding: nil,
                 screenShareEncoding: nil,
-                simulcast: false, // Disable simulcast here
+                simulcast: false,
                 simulcastLayers: [],
                 screenShareSimulcastLayers: [],
                 preferredCodec: nil,
@@ -213,43 +201,33 @@ struct ControlBar: View {
                 streamName: nil
             )
             
-            // Determine the target mode based on the toggleMode
             let targetMode = toggleMode == .toggle ? !isVideoEnabled : (toggleMode == .on)
             
-            // Check if the video is already in the targeted state
             if (isVideoEnabled && toggleMode == .on) || (!isVideoEnabled && toggleMode == .off) {
                 print("video is already in the targeted state")
-                return  // exit as no need to toggle
+                return
             }
             
-            // Toggle video
             try await self.room.localParticipant.setCamera(
                 enabled: targetMode,
                 captureOptions: captureOptions,
                 publishOptions: publishOptions
             )
             isVideoEnabled = targetMode
-            
             print("toggle video to \(isVideoEnabled ? "enabled" : "disabled")")
         }
     }
     
     private func toggleScreenShare(toggleMode: ToggleMode = .toggle) {
         Task {
-            // Ensure video is turned off before starting screen share
-//            if isVideoEnabled {
-//                try await toggleVideo(toggleMode: .off)
-//            }
-            
-            // Determine the target mode based on the toggleMode
             let targetMode = toggleMode == .toggle ? !isScreenSharingEnabled : (toggleMode == .on)
-
             try await self.room.localParticipant.setScreenShare(enabled: targetMode)
             isScreenSharingEnabled = targetMode
             print("Screen sharing toggled to \(isScreenSharingEnabled ? "enabled" : "disabled")")
         }
     }
 }
+
 
 /// Displays real-time audio levels for the local participant
 private struct LocalAudioVisualizer: View {
@@ -286,50 +264,46 @@ private struct LocalAudioVisualizer: View {
 /// Button shown when disconnected to start a new conversation
 private struct ConnectButton: View {
     var connectAction: () -> Void
+    var width: CGFloat = 70
+    var height: CGFloat = 70
+    var fontSize: CGFloat = 28
 
     var body: some View {
         Button(action: connectAction) {
-            Text("Start a Conversation")
-                .font(.system(size:22))
-//                .textCase(.uppercase)
-                .frame(height: 50)
-                .padding(.horizontal, 18)
-                .contentShape(Rectangle())
+            Image(systemName: "phone.fill")
+                .font(.system(size: fontSize))
+                .foregroundColor(.white)
+                .frame(width: width, height: height)
+                .background(Color.green.opacity(0.9))
+                .clipShape(Circle())
         }
         .buttonStyle(.plain)
-        .background(
-            Color("ButtonBackgroundColor")
-//            .primary.opacity(0.1)
-        )
-        .foregroundStyle(.primary)
-        .cornerRadius(8)
     }
 }
 
+
 /// Button shown when connected to end the conversation
+
 private struct DisconnectButton: View {
     var disconnectAction: () -> Void
+    var width: CGFloat = 70
+    var height: CGFloat = 70
+    var fontSize: CGFloat = 28
 
     var body: some View {
         Button(action: disconnectAction) {
-            Label {
-                Text("Disconnect")
-            } icon: {
-                Image(systemName: "xmark")
-                    .fontWeight(.bold)
-            }
-            .labelStyle(.iconOnly)
-            .frame(width: 44, height: 44)
-            .contentShape(Rectangle())
+            Image(systemName: "xmark")
+                .font(.system(size: fontSize))
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(width: width, height: height)
+                .background(Color.red.opacity(0.9))
+                .clipShape(Circle())
         }
         .buttonStyle(.plain)
-        .background(
-            .red.opacity(0.9)
-        )
-        .foregroundStyle(.white)
-        .cornerRadius(8)
     }
 }
+
 
 /// (fake) button shown during connection state transitions
 private struct TransitionButton: View {

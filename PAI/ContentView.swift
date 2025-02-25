@@ -83,15 +83,14 @@ struct ContentView: View {
                 }
 
                 if room.connectionState == .connected {
-                    HStack {
-                        ControlBar(
-                            onStartConversation: startConversation,
-                            isAudioEnabled: $isAudioEnabled,
-                            isVideoEnabled: $isVideoEnabled,
-                            isTranscriptVisible: $isTranscriptVisible,
-                            isHoldToTalk: $isHoldToTalk
-                        )
-                    }
+                    ControlBar(
+                        onStartConversation: startConversation,
+                        isAudioEnabled: $isAudioEnabled,
+                        isVideoEnabled: $isVideoEnabled,
+                        isTranscriptVisible: $isTranscriptVisible,
+                        isHoldToTalk: $isHoldToTalk
+                    )
+                    
                         
                 } else {
                     VStack(spacing: 8) {

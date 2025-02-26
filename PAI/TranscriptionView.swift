@@ -7,10 +7,16 @@ struct TranscriptionView: View {
 
     var body: some View {
         ScrollViewWithProxy()
-            .frame(height: 200)
-            .background(Color("TranscriptBG"))
-            .cornerRadius(10)
-            .shadow(radius: 5)
+            // Add some padding so the container doesn't stick to edges
+            .padding(.horizontal)
+            // Instead of a solid color, use a semi-translucent material
+            .background(
+                ColorConstants.controlBackgroundWithMaterial()
+                    .cornerRadius(24)
+                    .shadow(color: ColorConstants.buttonShadow, radius: 10, x: 0, y: 5)
+            )
+            // Let the transcript grow, but not beyond 250 points in height
+            .frame(maxHeight: 200)
     }
 
     @ViewBuilder
@@ -39,7 +45,10 @@ private struct TranscriptionContent: View {
             MergedSegmentsList(segments: segments, segmentRole: segmentRole)
             BottomAnchor()
         }
-        .padding()
+        // Adjust overall padding inside the transcript
+        .padding(.top, 8)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
         .background(ScrollOffsetReader(userHasScrolledUp: $userHasScrolledUp))
         .onChange(of: segments) { _ in
             handleSegmentsChange(proxy: proxy)
@@ -55,6 +64,7 @@ private struct TranscriptionContent: View {
     }
 }
 
+
 private struct MergedSegmentsList: View {
     let segments: [TranscriptionSegment]
     let segmentRole: [String: String]
@@ -65,6 +75,7 @@ private struct MergedSegmentsList: View {
                 .id(message.id)
         }
     }
+
 
     private struct MergedMessage: Identifiable {
         let id: String
@@ -162,6 +173,7 @@ private struct MessageView: View {
     var body: some View {
         Text(text + (isFinal ? "" : " …"))
             .padding(8)
+            // Keep distinct user vs. assistant backgrounds, or unify them if you prefer
             .background(isUser ? Color("TranscriptUserBG") : Color("TranscriptAIBG"))
             .cornerRadius(8)
             .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
@@ -199,52 +211,3 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
-
-#if DEBUG
-@testable import LiveKit
-import SwiftUI
-
-struct TranscriptionView_Previews: PreviewProvider {
-    static var previews: some View {
-        let previewDelegate = TranscriptionDelegate()
-        let now = Date()
-        
-        previewDelegate.receivedSegments = [
-            TranscriptionSegment(
-                id: "1",
-                text: "User: Hello, how are you?",
-                language: "en", // Providing a default language
-                firstReceivedTime: now,
-                lastReceivedTime: now,
-                isFinal: true
-            ),
-            TranscriptionSegment(
-                id: "2",
-                text: "Assistant: I'm fine, thank you!",
-                language: "en",
-                firstReceivedTime: now.addingTimeInterval(1),
-                lastReceivedTime: now.addingTimeInterval(1),
-                isFinal: true
-            ),
-            TranscriptionSegment(
-                id: "3",
-                text: "User: That's great to hear.",
-                language: "en",
-                firstReceivedTime: now.addingTimeInterval(2),
-                lastReceivedTime: now.addingTimeInterval(2),
-                isFinal: true
-            )
-        ]
-        
-        previewDelegate.segmentRole = [
-            "1": "user",
-            "2": "assistant",
-            "3": "user"
-        ]
-        
-        return TranscriptionView(delegate: previewDelegate)
-            .previewLayout(.sizeThatFits)
-            .padding()
-    }
-}
-#endif

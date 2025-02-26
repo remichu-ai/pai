@@ -69,14 +69,18 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity)
                         .frame(maxHeight: .infinity)
                 } else {
+                    if room.connectionState == .connected {
+                        Spacer() // Pushes everything below to the bottom
+                    }
                     StatusView()
                         .frame(height: 256)
                         .frame(maxWidth: 512)
+                    if room.connectionState == .connected {
+                        Spacer() // Pushes everything below to the bottom
+                    }
                 }
                 
-                if room.connectionState == .connected {
-                    Spacer() // Pushes everything below to the bottom
-                }
+
 
                 if isTranscriptVisible {
                     TranscriptionView(delegate: transcriptionDelegate)
@@ -93,7 +97,7 @@ struct ContentView: View {
                     
                         
                 } else {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 30) {
                         
                         ControlBar(
                             onStartConversation: startConversation,
@@ -104,6 +108,7 @@ struct ContentView: View {
                         )
                         
                         HoldToTalkView(isHoldToTalk: $isHoldToTalk)
+                            .padding(.top, 20)
                     }
                 }
             }

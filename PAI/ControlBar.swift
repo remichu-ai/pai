@@ -18,6 +18,7 @@ struct ControlBar: View {
     @State private var isConnecting: Bool = false
     @State private var isDisconnecting: Bool = false
     @State private var cameraPosition: AVCaptureDevice.Position = .back
+    @State private var isRecording: Bool = false
 
     // Updated dimensions for a more modern look
     let buttonSize: CGFloat = 70
@@ -92,14 +93,44 @@ struct ControlBar: View {
             case .connected:
                 // Control buttons in a modern layout
                 HStack(spacing: 28) {
-                    RoundControlButton(
-                        iconName: isAudioEnabled ? "mic.fill" : "mic.slash.fill",
-                        action: { toggleAudio(toggleMode: .toggle) },
-                        isActive: isAudioEnabled,
-                        primaryColor: .blue,
-                        size: buttonSize,
-                        fontSize: buttonFontSize
-                    )
+                    // Change mic button to record button when Hold-to-Talk is enabled
+                    if isHoldToTalk {
+                        // Custom record button with prominent styling
+                        Button(action: toggleRecording) {
+                            ZStack {
+                                Circle()
+                                    .fill(isRecording ? Color.red : ColorConstants.buttonBackground)
+                                    .frame(width: buttonSize, height: buttonSize)
+                                    .shadow(color: ColorConstants.buttonShadow, radius: 5, x: 0, y: 2)
+                                
+                                if isRecording {
+                                    Image(systemName: "stop.fill")
+                                        .font(.system(size: buttonFontSize, weight: .semibold))
+                                        .foregroundColor(.white)
+                                } else {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white)
+                                            .frame(width: buttonSize * 0.7)
+                                        Circle()
+                                            .fill(Color.red)
+                                            .frame(width: buttonSize * 0.5)
+                                    }
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .shadow(color: isRecording ? Color.red.opacity(0.4) : Color.red.opacity(0.2), radius: 8, x: 0, y: 3)
+                    } else {
+                        RoundControlButton(
+                            iconName: isAudioEnabled ? "mic.fill" : "mic.slash.fill",
+                            action: { toggleAudio(toggleMode: .toggle) },
+                            isActive: isAudioEnabled,
+                            primaryColor: .blue,
+                            size: buttonSize,
+                            fontSize: buttonFontSize
+                        )
+                    }
                     
                     RoundControlButton(
                         iconName: isVideoEnabled ? "video.fill" : "video.slash.fill",
@@ -119,15 +150,15 @@ struct ControlBar: View {
                         fontSize: buttonFontSize
                     )
                     
-                    // End call button
+                    // End call button with X icon
                     Button(action: disconnect) {
                         ZStack {
                             Circle()
                                 .fill(Color.red)
                                 .frame(width: buttonSize, height: buttonSize)
                             
-                            Image(systemName: "phone.down.fill")
-                                .font(.system(size: buttonFontSize))
+                            Image(systemName: "xmark")
+                                .font(.system(size: buttonFontSize, weight: .bold))
                                 .foregroundColor(.white)
                         }
                     }
@@ -173,6 +204,45 @@ struct ControlBar: View {
             let targetMode = toggleMode == .toggle ? !isAudioEnabled : (toggleMode == .on)
             try await self.room.localParticipant.setMicrophone(enabled: targetMode, captureOptions: captureOptions)
             isAudioEnabled = targetMode
+        }
+    }
+    
+    private func toggleRecording() {
+        Task {
+            if isRecording {
+                // Currently recording, need to stop
+                isRecording = false
+                
+                // Turn off audio capture
+                try await self.room.localParticipant.setMicrophone(enabled: false)
+                isAudioEnabled = false
+                
+                // Call createConversation function
+                do {
+                    let result = try await createConversation(room: room)
+                    switch result {
+                    case .success(let response):
+                        print("Successfully created conversation: \(response)")
+                    case .failure(let error):
+                        print("Failed to create conversation: \(error)")
+                    }
+                } catch {
+                    print("Error creating conversation: \(error)")
+                }
+            } else {
+                // Not recording, need to start
+                isRecording = true
+                
+                // Turn on audio capture
+                let captureOptions = AudioCaptureOptions(
+                    echoCancellation: true,
+                    autoGainControl: true,
+                    noiseSuppression: true,
+                    highpassFilter: true
+                )
+                try await self.room.localParticipant.setMicrophone(enabled: true, captureOptions: captureOptions)
+                isAudioEnabled = true
+            }
         }
     }
     
@@ -224,8 +294,6 @@ struct ControlBar: View {
             }
         }
     }
-
-
     
     private func toggleScreenShare(toggleMode: ToggleMode = .toggle) {
         Task {
@@ -246,9 +314,11 @@ struct ControlBar: View {
             isVideoEnabled = false
             isScreenSharingEnabled = false
             isTranscriptVisible = false
+            isRecording = false
         }
     }
 }
+
 
 // Modernized local audio visualizer
 struct LocalAudioVisualizer: View {

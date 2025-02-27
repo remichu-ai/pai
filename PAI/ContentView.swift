@@ -17,8 +17,8 @@ struct ContentView: View {
     @State private var isTranscriptVisible: Bool = false
     @EnvironmentObject var sessionConfigStore: SessionConfigStore
     
-    // New state for hand-free mode (default on)
     @State private var isHoldToTalk: Bool = true
+    @Environment(\.colorScheme) private var colorScheme
 
     init() {
         let delegate = TranscriptionDelegate()
@@ -27,66 +27,65 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Top bar with only settings (removed hand-free toggle here)
-            HStack {
-                Spacer()
-                if isVideoEnabled {
-                    MiniStatusView()
-                }
-                
-                if room.connectionState == .connected {
-                    Button(action: { showingToolSettings.toggle() }) {
-                        Image(systemName: "wrench")
-                            .font(.system(size: 20))
-                            .foregroundColor(Color("ButtonColor"))
-                            .frame(width: 44, height: 44)
-                            .background(Color("ButtonBackgroundColor"))
-                            .clipShape(Circle())
-                    }
-                    .padding(.trailing, 8)
-                }
-                
-                Button(action: { showingSettings.toggle() }) {
-                    Image(systemName: "gear")
-                        .font(.system(size: 20))
-                        .foregroundColor(Color("ButtonColor"))
-                        .frame(width: 44, height: 44)
-                        .background(Color("ButtonBackgroundColor"))
-                        .clipShape(Circle())
-                }
-                .padding(.trailing, 16)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 4)
+        ZStack {
+            // Adaptive background color based on color scheme
+            (colorScheme == .dark ? Color.black : Color(UIColor.systemBackground))
+                .edgesIgnoringSafeArea(.all) // Ensure background extends to edges
             
-            // Main content area
-            VStack(spacing: 24) {
-                // Video/Status and transcript views
-                if isVideoEnabled {
-                    LocalParticipantView()
-                        .aspectRatio(3 / 4, contentMode: .fit)
-                        .frame(maxWidth: .infinity)
-                        .frame(maxHeight: .infinity)
-                } else {
-                    if room.connectionState == .connected {
-                        Spacer() // Pushes everything below to the bottom
+            // Different layout based on connection state
+            if room.connectionState == .connected {
+                // CONNECTED MODE - Controls at bottom
+                VStack(spacing: 0) {
+                    // Top bar
+                    HStack {
+                        Spacer()
+                        if isVideoEnabled {
+                            MiniStatusView()
+                        }
+                        
+                        Button(action: { showingToolSettings.toggle() }) {
+                            Image(systemName: "wrench")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color("ButtonColor"))
+                                .frame(width: 44, height: 44)
+                                .background(Color("ButtonBackgroundColor"))
+                                .clipShape(Circle())
+                        }
+                        .padding(.trailing, 8)
+                        
+                        Button(action: { showingSettings.toggle() }) {
+                            Image(systemName: "gear")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color("ButtonColor"))
+                                .frame(width: 44, height: 44)
+                                .background(Color("ButtonBackgroundColor"))
+                                .clipShape(Circle())
+                        }
+                        .padding(.trailing, 16)
                     }
-                    StatusView()
-                        .frame(height: 256)
-                        .frame(maxWidth: 512)
-                    if room.connectionState == .connected {
-                        Spacer() // Pushes everything below to the bottom
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                    
+                    // Main content
+                    Spacer() // Push content to top
+                    
+                    if isVideoEnabled {
+                        LocalParticipantView()
+                            .aspectRatio(3 / 4, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        StatusView()
+                            .frame(height: 256)
+                            .frame(maxWidth: 512)
                     }
-                }
-                
-
-
-                if isTranscriptVisible {
-                    TranscriptionView(delegate: transcriptionDelegate)
-                }
-
-                if room.connectionState == .connected {
+                    
+                    if isTranscriptVisible {
+                        TranscriptionView(delegate: transcriptionDelegate)
+                    }
+                    
+                    Spacer() // Push controls to bottom
+                    
+                    // Controls at bottom with added padding
                     ControlBar(
                         onStartConversation: startConversation,
                         isAudioEnabled: $isAudioEnabled,
@@ -94,11 +93,46 @@ struct ContentView: View {
                         isTranscriptVisible: $isTranscriptVisible,
                         isHoldToTalk: $isHoldToTalk
                     )
+                    .padding(.bottom, 16) // Extra bottom padding in connected mode
+                }
+                .padding(.horizontal)
+            } else {
+                // DISCONNECTED MODE - Controls positioned centrally like before
+                VStack(spacing: 0) {
+                    // Top bar
+                    HStack {
+                        Spacer()
+                        Button(action: { showingSettings.toggle() }) {
+                            Image(systemName: "gear")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color("ButtonColor"))
+                                .frame(width: 44, height: 44)
+                                .background(Color("ButtonBackgroundColor"))
+                                .clipShape(Circle())
+                        }
+                        .padding(.trailing, 16)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
                     
-                        
-                } else {
+                    // Center content vertically
+                    Spacer()
+                    
+                    // Status view in center
+                    if isVideoEnabled {
+                        LocalParticipantView()
+                            .aspectRatio(3 / 4, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        StatusView()
+                            .frame(height: 256)
+                            .frame(maxWidth: 512)
+                    }
+                    
+                    Spacer()
+                    
+                    // Controls in center-bottom
                     VStack(spacing: 30) {
-                        
                         ControlBar(
                             onStartConversation: startConversation,
                             isAudioEnabled: $isAudioEnabled,
@@ -110,12 +144,14 @@ struct ContentView: View {
                         HoldToTalkView(isHoldToTalk: $isHoldToTalk)
                             .padding(.top, 20)
                     }
+                    
+                    // Space below controls - adjust this value to lift controls higher
+                    Spacer().frame(height: 100)
                 }
+                .padding(.horizontal)
             }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .edgesIgnoringSafeArea(.bottom)
         .environmentObject(room)
         .onAppear {
             // Any additional onAppear logic
@@ -149,6 +185,7 @@ struct ContentView: View {
     }
     
     private func startConversation() {
+        // Your existing function implementation
         if serverUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             showingMissingUrlAlert = true
             return

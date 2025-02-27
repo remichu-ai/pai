@@ -19,6 +19,7 @@ struct ControlBar: View {
     @State private var isDisconnecting: Bool = false
     @State private var cameraPosition: AVCaptureDevice.Position = .back
     @State private var isRecording: Bool = false
+    @State private var showingAdditionalSettings: Bool = false  // New state variable
 
     // Updated dimensions for a more modern look
     let buttonSize: CGFloat = 70
@@ -45,40 +46,37 @@ struct ControlBar: View {
             // Top row for toggles when connected
             if currentConfiguration == .connected {
                 HStack(spacing: 16) {
-                    // Audio visualizer with fixed width
-                    LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
-                        .frame(height: 40)
-                        .frame(width: 90)
-                        .background(Color.black.opacity(0.2))
-                        .cornerRadius(20)
-                        .id(room.localParticipant.firstAudioTrack?.id ?? "no-track")
-                    
-                    // Camera flip button
-                    Button(action: flipCamera) {
-                        Image(systemName: "camera.rotate")
-                            .font(.system(size: 18, weight: .medium))
+                    // New additional settings button
+                    Button(action: { showingAdditionalSettings.toggle() }) {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.system(size: 24, weight: .medium))
                             .foregroundColor(ColorConstants.buttonContent)
                             .padding(10)
                             .background(ColorConstants.buttonBackground)
                             .clipShape(Circle())
                     }
+                    Spacer()
+                    
+                    // Audio visualizer with fixed width
+                    LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
+                        .frame(height: 26)
+                        .frame(width: 90)
+                        .background(Color.black.opacity(0.2))
+                        .cornerRadius(12)
+                        .id(room.localParticipant.firstAudioTrack?.id ?? "no-track")
                     
                     Spacer()
                     
-                    // Simplified Toggle controls - just icon and toggle, no container
-                    HStack(spacing: 8) {
-                        Image(systemName: isTranscriptVisible ? "text.bubble.fill" : "text.bubble")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(isTranscriptVisible ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor)
-                        
-                        Toggle("", isOn: $isTranscriptVisible)
-                            .toggleStyle(SwitchToggleStyle(tint: ColorConstants.toggleActiveColor))
-                            .labelsHidden()
-                            .scaleEffect(0.9)
+                    // Camera flip button
+                    Button(action: flipCamera) {
+                        Image(systemName: "camera.rotate")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(ColorConstants.buttonContent)
+                            .padding(10)
+                            .background(ColorConstants.buttonBackground)
+                            .clipShape(Circle())
                     }
-                    
-                    // Use the HoldToTalkView component but set showLabel to false
-                    HoldToTalkView(isHoldToTalk: $isHoldToTalk, showLabel: false)
+
                 }
                 .padding(.horizontal, 16)
             }
@@ -86,16 +84,12 @@ struct ControlBar: View {
             // Main controls
             switch currentConfiguration {
             case .disconnected:
-                // Just the StartCallButton without any container styling
                 UnstyledStartCallButton(connectAction: onStartConversation)
                     .matchedGeometryEffect(id: "main-button", in: animation)
                 
             case .connected:
-                // Control buttons in a modern layout
                 HStack(spacing: 28) {
-                    // Change mic button to record button when Hold-to-Talk is enabled
                     if isHoldToTalk {
-                        // Custom record button with prominent styling
                         Button(action: toggleRecording) {
                             ZStack {
                                 Circle()
@@ -129,17 +123,17 @@ struct ControlBar: View {
                             primaryColor: .blue,
                             size: buttonSize,
                             fontSize: buttonFontSize
+                            )
+                        }
+                        
+                        RoundControlButton(
+                            iconName: isVideoEnabled ? "video.fill" : "video.slash.fill",
+                            action: { toggleVideo(toggleMode: .toggle) },
+                            isActive: isVideoEnabled,
+                            primaryColor: .indigo,
+                            size: buttonSize,
+                            fontSize: buttonFontSize
                         )
-                    }
-                    
-                    RoundControlButton(
-                        iconName: isVideoEnabled ? "video.fill" : "video.slash.fill",
-                        action: { toggleVideo(toggleMode: .toggle) },
-                        isActive: isVideoEnabled,
-                        primaryColor: .indigo,
-                        size: buttonSize,
-                        fontSize: buttonFontSize
-                    )
                     
                     RoundControlButton(
                         iconName: isScreenSharingEnabled ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle",
@@ -171,7 +165,6 @@ struct ControlBar: View {
                     .matchedGeometryEffect(id: "main-button", in: animation)
             }
         }
-        // Only apply container styling when connected
         .padding(.vertical, currentConfiguration != .disconnected ? 16 : 0)
         .background(
             Group {
@@ -183,6 +176,13 @@ struct ControlBar: View {
             }
         )
         .animation(.spring(response: 0.3), value: currentConfiguration)
+        // Present the additional settings view as a sheet
+        .sheet(isPresented: $showingAdditionalSettings) {
+            AdditionalSettingsView(
+                isTranscriptVisible: $isTranscriptVisible,
+                isHoldToTalk: $isHoldToTalk
+            )
+        }
     }
     
     // Toggle functions remain the same
@@ -338,7 +338,7 @@ struct LocalAudioVisualizer: View {
     public var body: some View {
         ZStack {
             // Use the visualizerBackground from ColorConstants
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(ColorConstants.visualizerBackground)
                 .shadow(color: ColorConstants.buttonShadow, radius: 3, x: 0, y: 1)
             
@@ -360,7 +360,7 @@ struct LocalAudioVisualizer: View {
             }
             .padding(.horizontal, 10)
         }
-        .frame(height: 40)
+        .frame(height: 26)
         .frame(width: 90)
     }
 }

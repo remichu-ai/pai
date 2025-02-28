@@ -6,31 +6,29 @@ import AVFoundation
 struct ControlBar: View {
     @EnvironmentObject private var room: Room
         
-    // Callback when the connect button is tapped
     var onStartConversation: () -> Void
-    
     @Binding var isAudioEnabled: Bool
     @Binding var isVideoEnabled: Bool
     @Binding var isTranscriptVisible: Bool
     @Binding var isHoldToTalk: Bool
+    var onToggleAdditionalSettings: () -> Void
     
     @State private var isScreenSharingEnabled: Bool = false
     @State private var isConnecting: Bool = false
     @State private var isDisconnecting: Bool = false
     @State private var cameraPosition: AVCaptureDevice.Position = .back
     @State private var isRecording: Bool = false
-    @State private var showingAdditionalSettings: Bool = false  // New state variable
-
-    // Updated dimensions for a more modern look
+    
     let buttonSize: CGFloat = 70
     let buttonFontSize: CGFloat = 22
     
-    @Namespace private var animation
+    let buttonSizeSmall: CGFloat = 60
+    let buttonFontSizeSmall: CGFloat = 20
 
     private enum Configuration {
         case disconnected, connected, transitioning
     }
-
+    
     private var currentConfiguration: Configuration {
         if isConnecting || isDisconnecting {
             return .transitioning
@@ -40,34 +38,33 @@ struct ControlBar: View {
             return .connected
         }
     }
-
+    
     var body: some View {
         VStack(spacing: 12) {
-            // Top row for toggles when connected
             if currentConfiguration == .connected {
                 HStack(spacing: 16) {
-                    // New additional settings button
-                    Button(action: { showingAdditionalSettings.toggle() }) {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundColor(ColorConstants.buttonContent)
-                            .padding(10)
-                            .background(ColorConstants.buttonBackground)
-                            .clipShape(Circle())
+                    Button(action: {
+                        onToggleAdditionalSettings()
+                    }) {
+                        Circle()
+                            .fill(ColorConstants.buttonBackground)
+                            .frame(width: 40, height: 40)
+                            .overlay(
+                                Image(systemName: "ellipsis")
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(ColorConstants.buttonContent)
+                            )
                     }
+                    
                     Spacer()
                     
-                    // Audio visualizer with fixed width
                     LocalAudioVisualizer(track: room.localParticipant.firstAudioTrack)
                         .frame(height: 26)
                         .frame(width: 90)
-                        .background(Color.black.opacity(0.2))
-                        .cornerRadius(12)
-                        .id(room.localParticipant.firstAudioTrack?.id ?? "no-track")
+                        .id(room.localParticipant.firstAudioTrack?.hashValue ?? 0)
                     
                     Spacer()
                     
-                    // Camera flip button
                     Button(action: flipCamera) {
                         Image(systemName: "camera.rotate")
                             .font(.system(size: 24, weight: .medium))
@@ -76,45 +73,51 @@ struct ControlBar: View {
                             .background(ColorConstants.buttonBackground)
                             .clipShape(Circle())
                     }
-
                 }
                 .padding(.horizontal, 16)
             }
             
-            // Main controls
             switch currentConfiguration {
             case .disconnected:
                 UnstyledStartCallButton(connectAction: onStartConversation)
-                    .matchedGeometryEffect(id: "main-button", in: animation)
+                    .transition(.identity)
                 
             case .connected:
                 HStack(spacing: 28) {
                     if isHoldToTalk {
-                        Button(action: toggleRecording) {
-                            ZStack {
-                                Circle()
-                                    .fill(isRecording ? Color.red : ColorConstants.buttonBackground)
-                                    .frame(width: buttonSize, height: buttonSize)
-                                    .shadow(color: ColorConstants.buttonShadow, radius: 5, x: 0, y: 2)
-                                
-                                if isRecording {
-                                    Image(systemName: "stop.fill")
-                                        .font(.system(size: buttonFontSize, weight: .semibold))
-                                        .foregroundColor(.white)
-                                } else {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.white)
-                                            .frame(width: buttonSize * 0.7)
-                                        Circle()
-                                            .fill(Color.red)
-                                            .frame(width: buttonSize * 0.5)
-                                    }
-                                }
+                        ZStack {
+                            Circle()
+                                .fill(isRecording ? ColorConstants.holdToTalkActive : ColorConstants.holdToTalkIdle)
+                                .frame(width: buttonSize, height: buttonSize)
+                                .shadow(color: .gray.opacity(0.4), radius: 4, x: 0, y: 2)
+                            
+                            if isRecording {
+                                Image(systemName: "stop.fill")
+                                    .font(.system(size: 28, weight: .semibold))
+                                    .foregroundColor(.white)
+                            } else {
+                                Image(systemName: "mic.circle.fill")
+                                    .font(.system(size: 32, weight: .bold))
+                                    .foregroundColor(.white)
                             }
                         }
-                        .buttonStyle(.plain)
-                        .shadow(color: isRecording ? Color.red.opacity(0.4) : Color.red.opacity(0.2), radius: 8, x: 0, y: 3)
+                        // Define the hit area explicitly with contentShape.
+                        .contentShape(Circle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { _ in
+                                    // On touch down, start recording.
+                                    if !isRecording {
+                                        setRecording(to: true)
+                                    }
+                                }
+                                .onEnded { _ in
+                                    // On touch up, stop recording.
+                                    if isRecording {
+                                        setRecording(to: false)
+                                    }
+                                }
+                        )
                     } else {
                         RoundControlButton(
                             iconName: isAudioEnabled ? "mic.fill" : "mic.slash.fill",
@@ -123,28 +126,27 @@ struct ControlBar: View {
                             primaryColor: .blue,
                             size: buttonSize,
                             fontSize: buttonFontSize
-                            )
-                        }
-                        
-                        RoundControlButton(
-                            iconName: isVideoEnabled ? "video.fill" : "video.slash.fill",
-                            action: { toggleVideo(toggleMode: .toggle) },
-                            isActive: isVideoEnabled,
-                            primaryColor: .indigo,
-                            size: buttonSize,
-                            fontSize: buttonFontSize
                         )
+                    }
+                    
+                    RoundControlButton(
+                        iconName: isVideoEnabled ? "video.fill" : "video.slash.fill",
+                        action: { toggleVideo(toggleMode: .toggle) },
+                        isActive: isVideoEnabled,
+                        primaryColor: .indigo,
+                        size: buttonSizeSmall,
+                        fontSize: buttonFontSizeSmall
+                    )
                     
                     RoundControlButton(
                         iconName: isScreenSharingEnabled ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle",
                         action: { toggleScreenShare(toggleMode: .toggle) },
                         isActive: isScreenSharingEnabled,
                         primaryColor: .purple,
-                        size: buttonSize,
-                        fontSize: buttonFontSize
+                        size: buttonSizeSmall,
+                        fontSize: buttonFontSizeSmall
                     )
                     
-                    // End call button with X icon
                     Button(action: disconnect) {
                         ZStack {
                             Circle()
@@ -156,13 +158,14 @@ struct ControlBar: View {
                                 .foregroundColor(.white)
                         }
                     }
-                    .matchedGeometryEffect(id: "main-button", in: animation)
+                    .transition(.identity)
                 }
                 .padding(.horizontal, 20)
+                .transition(.identity)
                 
             case .transitioning:
                 TransitionIndicator(isConnecting: isConnecting)
-                    .matchedGeometryEffect(id: "main-button", in: animation)
+                    .transition(.identity)
             }
         }
         .padding(.vertical, currentConfiguration != .disconnected ? 16 : 0)
@@ -175,17 +178,46 @@ struct ControlBar: View {
                 }
             }
         )
-        .animation(.spring(response: 0.3), value: currentConfiguration)
-        // Present the additional settings view as a sheet
-        .sheet(isPresented: $showingAdditionalSettings) {
-            AdditionalSettingsView(
-                isTranscriptVisible: $isTranscriptVisible,
-                isHoldToTalk: $isHoldToTalk
-            )
+        .animation(nil, value: currentConfiguration)
+    }
+    
+    // MARK: - Standardized Recording Method
+    private func setRecording(to shouldRecord: Bool) {
+        Task {
+            if shouldRecord && !isRecording {
+                // Start recording.
+                isRecording = true
+                let captureOptions = AudioCaptureOptions(
+                    echoCancellation: true,
+                    autoGainControl: true,
+                    noiseSuppression: true,
+                    highpassFilter: true
+                )
+                try await room.localParticipant.setMicrophone(enabled: true, captureOptions: captureOptions)
+                isAudioEnabled = true
+            } else if !shouldRecord && isRecording {
+                // Stop recording.
+                isRecording = false
+                try await room.localParticipant.setMicrophone(enabled: false)
+                isAudioEnabled = false
+                
+                // Trigger conversation creation logic.
+                do {
+                    let result = try await createConversation(room: room)
+                    switch result {
+                    case .success(let response):
+                        print("Successfully created conversation: \(response)")
+                    case .failure(let error):
+                        print("Failed to create conversation: \(error)")
+                    }
+                } catch {
+                    print("Error creating conversation: \(error)")
+                }
+            }
         }
     }
     
-    // Toggle functions remain the same
+    // Other toggle and helper functions remain the same.
     enum ToggleMode: String {
         case on = "on"
         case off = "off"
@@ -204,45 +236,6 @@ struct ControlBar: View {
             let targetMode = toggleMode == .toggle ? !isAudioEnabled : (toggleMode == .on)
             try await self.room.localParticipant.setMicrophone(enabled: targetMode, captureOptions: captureOptions)
             isAudioEnabled = targetMode
-        }
-    }
-    
-    private func toggleRecording() {
-        Task {
-            if isRecording {
-                // Currently recording, need to stop
-                isRecording = false
-                
-                // Turn off audio capture
-                try await self.room.localParticipant.setMicrophone(enabled: false)
-                isAudioEnabled = false
-                
-                // Call createConversation function
-                do {
-                    let result = try await createConversation(room: room)
-                    switch result {
-                    case .success(let response):
-                        print("Successfully created conversation: \(response)")
-                    case .failure(let error):
-                        print("Failed to create conversation: \(error)")
-                    }
-                } catch {
-                    print("Error creating conversation: \(error)")
-                }
-            } else {
-                // Not recording, need to start
-                isRecording = true
-                
-                // Turn on audio capture
-                let captureOptions = AudioCaptureOptions(
-                    echoCancellation: true,
-                    autoGainControl: true,
-                    noiseSuppression: true,
-                    highpassFilter: true
-                )
-                try await self.room.localParticipant.setMicrophone(enabled: true, captureOptions: captureOptions)
-                isAudioEnabled = true
-            }
         }
     }
     
@@ -268,7 +261,6 @@ struct ControlBar: View {
             )
             
             let targetMode = toggleMode == .toggle ? !isVideoEnabled : (toggleMode == .on)
-            
             try await self.room.localParticipant.setCamera(
                 enabled: targetMode,
                 captureOptions: captureOptions,
@@ -279,10 +271,7 @@ struct ControlBar: View {
     }
     
     private func flipCamera() {
-        // Ensure video is enabled
         guard isVideoEnabled else { return }
-        
-        // Attempt to use the camera capturer's switch method
         if let track = room.localParticipant.firstCameraVideoTrack as? LocalVideoTrack,
            let cameraCapturer = track.capturer as? CameraCapturer {
             Task {
@@ -378,7 +367,8 @@ struct RoundControlButton: View {
         Button(action: action) {
             ZStack {
                 Circle()
-                    .fill(isActive ? primaryColor : ColorConstants.buttonBackground)
+                    // Use a contrasting color if inactive
+                    .fill(isActive ? primaryColor : ColorConstants.buttonBackgroundInactive)
                     .frame(width: size, height: size)
                     .shadow(color: ColorConstants.buttonShadow, radius: 5, x: 0, y: 2)
                 
@@ -388,9 +378,12 @@ struct RoundControlButton: View {
             }
         }
         .buttonStyle(.plain)
-        .shadow(color: isActive ? primaryColor.opacity(0.4) : Color.clear, radius: 5, x: 0, y: 3)
+        // If active, add a subtle glow or keep it clear if inactive
+        .shadow(color: isActive ? primaryColor.opacity(0.4) : Color.clear,
+                radius: 5, x: 0, y: 3)
     }
 }
+
 
 // Improved start call button with audio wave icon matching the design in screenshot
 struct UnstyledStartCallButton: View {
@@ -404,7 +397,7 @@ struct UnstyledStartCallButton: View {
                     .fill(Color.blue)
                     .frame(width: 120, height: 120) // Increased from 110 to 120
                     // Add standard shadow for better visibility
-                    .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .shadow(color: ColorConstants.connectButtonBackground, radius: 8, x: 0, y: 4)
                 
                 // Audio wave bars with bigger inner area
                 HStack(spacing: 4) { // Increased spacing from 3 to 4

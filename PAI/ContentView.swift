@@ -20,6 +20,9 @@ struct ContentView: View {
     @State private var isHoldToTalk: Bool = true
     @Environment(\.colorScheme) private var colorScheme
 
+    // HOISTED STATE: We show this popup in an overlay at the top level
+    @State private var showingAdditionalSettings: Bool = false
+
     init() {
         let delegate = TranscriptionDelegate()
         _room = StateObject(wrappedValue: Room(delegate: delegate))
@@ -30,11 +33,11 @@ struct ContentView: View {
         ZStack {
             // Adaptive background color based on color scheme
             (colorScheme == .dark ? Color.black : Color(UIColor.systemBackground))
-                .edgesIgnoringSafeArea(.all) // Ensure background extends to edges
+                .edgesIgnoringSafeArea(.all)
             
-            // Different layout based on connection state
+            // Layout depends on connection state
             if room.connectionState == .connected {
-                // CONNECTED MODE - Controls at bottom
+                // CONNECTED MODE
                 VStack(spacing: 0) {
                     // Top bar
                     HStack {
@@ -66,8 +69,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
                     
-                    // Main content
-                    Spacer() // Push content to top
+                    Spacer()
                     
                     if isVideoEnabled {
                         LocalParticipantView()
@@ -83,21 +85,28 @@ struct ContentView: View {
                         TranscriptionView(delegate: transcriptionDelegate)
                     }
                     
-                    Spacer() // Push controls to bottom
+                    Spacer()
                     
-                    // Controls at bottom with added padding
+                    // Controls at bottom
                     ControlBar(
                         onStartConversation: startConversation,
                         isAudioEnabled: $isAudioEnabled,
                         isVideoEnabled: $isVideoEnabled,
                         isTranscriptVisible: $isTranscriptVisible,
-                        isHoldToTalk: $isHoldToTalk
+                        isHoldToTalk: $isHoldToTalk,
+                        
+                        // NEW: pass a closure to toggle the popup
+                        onToggleAdditionalSettings: {
+                            withAnimation(.easeInOut(duration: 0.1)) {
+                                showingAdditionalSettings.toggle()
+                            }
+                        }
                     )
-                    .padding(.bottom, 16) // Extra bottom padding in connected mode
+                    .padding(.bottom, 16)
                 }
                 .padding(.horizontal)
             } else {
-                // DISCONNECTED MODE - Controls positioned centrally like before
+                // DISCONNECTED MODE
                 VStack(spacing: 0) {
                     // Top bar
                     HStack {
@@ -115,10 +124,8 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
                     
-                    // Center content vertically
                     Spacer()
                     
-                    // Status view in center
                     if isVideoEnabled {
                         LocalParticipantView()
                             .aspectRatio(3 / 4, contentMode: .fit)
@@ -131,21 +138,28 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // Controls in center-bottom
                     VStack(spacing: 30) {
                         ControlBar(
                             onStartConversation: startConversation,
                             isAudioEnabled: $isAudioEnabled,
                             isVideoEnabled: $isVideoEnabled,
                             isTranscriptVisible: $isTranscriptVisible,
-                            isHoldToTalk: $isHoldToTalk
+                            isHoldToTalk: $isHoldToTalk,
+                            
+                            // same closure for toggling
+                            onToggleAdditionalSettings: {
+                                withAnimation(.spring(
+                                    response: 0.15
+                                )) {
+                                    showingAdditionalSettings.toggle()
+                                }
+                            }
                         )
                         
                         HoldToTalkView(isHoldToTalk: $isHoldToTalk)
                             .padding(.top, 20)
                     }
                     
-                    // Space below controls - adjust this value to lift controls higher
                     Spacer().frame(height: 100)
                 }
                 .padding(.horizontal)
@@ -182,10 +196,25 @@ struct ContentView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        
+        // TOP-LEVEL OVERLAY FOR ADDITIONAL SETTINGS
+        .overlay(alignment: .bottomLeading) {
+            if showingAdditionalSettings {
+                AdditionalSettingsPopup(
+                    isTranscriptVisible: $isTranscriptVisible,
+                    isHoldToTalk: $isHoldToTalk
+                )
+                // Position it above the control bar:
+                .padding(.leading, 16)
+                .padding(.bottom, 130)
+                // Adjust '120' to your preference so it sits nicely above the ControlBar
+                .transition(.scale(scale: 0.9, anchor: .bottomLeading))
+                .zIndex(999)
+            }
+        }
     }
     
     private func startConversation() {
-        // Your existing function implementation
         if serverUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             showingMissingUrlAlert = true
             return
@@ -210,16 +239,16 @@ struct ContentView: View {
                         )
                     )
                     // start audio live stream if Hold-to-Talk not selected
-                    if isHoldToTalk==false {
+                    if isHoldToTalk == false {
                         try await room.localParticipant.setMicrophone(enabled: true, captureOptions: AudioCaptureOptions(
                             echoCancellation: true,
                             autoGainControl: true,
                             noiseSuppression: true,
                             highpassFilter: true
                         ))
-                        isAudioEnabled=true
-                    } else{
-                        isAudioEnabled=false
+                        isAudioEnabled = true
+                    } else {
+                        isAudioEnabled = false
                     }
                 } else {
                     print("Failed to fetch connection details")
@@ -235,25 +264,4 @@ struct ContentView: View {
     ContentView()
         .environmentObject(Room())
         .environmentObject(SessionConfigStore())
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .environmentObject(Room())
-            .environmentObject(SessionConfigStore())
-            .previewDisplayName("Default State")
-        
-        ContentView()
-            .environmentObject(Room())
-            .environmentObject(SessionConfigStore())
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Dark Mode")
-        
-        ContentView()
-            .environmentObject(Room())
-            .environmentObject(SessionConfigStore())
-            .previewDevice(PreviewDevice(rawValue: "iPad Pro (12.9-inch)"))
-            .previewDisplayName("iPad Pro")
-    }
 }

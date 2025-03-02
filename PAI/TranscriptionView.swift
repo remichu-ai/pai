@@ -4,18 +4,19 @@ import SwiftUI
 struct TranscriptionView: View {
     @ObservedObject var delegate: TranscriptionDelegate
     @State private var userHasScrolledUp: Bool = false
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ScrollViewWithProxy()
             // Add some padding so the container doesn't stick to edges
             .padding(.horizontal)
-            // Instead of a solid color, use a semi-translucent material
+            // Use the color constants with dynamic dark mode support
             .background(
-                ColorConstants.controlBackgroundWithMaterial()
+                ColorConstants.controlBackgroundWithMaterial(colorScheme)
                     .cornerRadius(24)
-                    .shadow(color: ColorConstants.buttonShadow, radius: 10, x: 0, y: 5)
+                    .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 10, x: 0, y: 5)
             )
-            // Let the transcript grow, but not beyond 250 points in height
+            // Let the transcript grow, but not beyond 200 points in height
             .frame(maxHeight: 200)
     }
 
@@ -39,6 +40,7 @@ private struct TranscriptionContent: View {
     let segmentRole: [String: String]
     @Binding var userHasScrolledUp: Bool
     let proxy: ScrollViewProxy
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -64,10 +66,10 @@ private struct TranscriptionContent: View {
     }
 }
 
-
 private struct MergedSegmentsList: View {
     let segments: [TranscriptionSegment]
     let segmentRole: [String: String]
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ForEach(mergedMessages, id: \.id) { message in
@@ -75,7 +77,6 @@ private struct MergedSegmentsList: View {
                 .id(message.id)
         }
     }
-
 
     private struct MergedMessage: Identifiable {
         let id: String
@@ -158,26 +159,29 @@ private struct MergedSegmentsList: View {
             ))
         }
         
-        print("Merged Messages: \(mergedMessages)")
         return mergedMessages
     }
-
-
 }
 
 private struct MessageView: View {
     let text: String
     let isUser: Bool
     let isFinal: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Text(text + (isFinal ? "" : " …"))
             .padding(8)
-            // Keep distinct user vs. assistant backgrounds, or unify them if you prefer
-            .background(isUser ? Color("TranscriptUserBG") : Color("TranscriptAIBG"))
+            // Use dynamic background colors based on dark/light mode
+            .background(
+                isUser ?
+                    (colorScheme == .dark ? Color.blue.opacity(0.3) : Color.blue.opacity(0.2)) :
+                    (colorScheme == .dark ? Color(hex: "2A2A2A") : Color(hex: "F0F0F0"))
+            )
             .cornerRadius(8)
             .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
-            .foregroundColor(isUser ? Color("TranscriptUserText") : Color("TranscriptAIText"))
+            // Use primary color which adapts to dark/light mode instead of hardcoded colors
+            .foregroundColor(Color.primary)
     }
 }
 

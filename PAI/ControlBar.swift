@@ -5,13 +5,14 @@ import AVFoundation
 
 struct ControlBar: View {
     @EnvironmentObject private var room: Room
+    @Environment(\.colorScheme) private var colorScheme
         
     var onStartConversation: () -> Void
     @Binding var isAudioEnabled: Bool
     @Binding var isVideoEnabled: Bool
     @Binding var isTranscriptVisible: Bool
     @Binding var isHandsFree: Bool
-    @Binding var isRecording: Bool    // <<-- Now passed as a binding
+    @Binding var isRecording: Bool
     var onToggleAdditionalSettings: () -> Void
     
     @State private var isScreenSharingEnabled: Bool = false
@@ -47,12 +48,12 @@ struct ControlBar: View {
                         onToggleAdditionalSettings()
                     }) {
                         Circle()
-                            .fill(ColorConstants.buttonBackground)
+                            .fill(ColorConstants.dynamicButtonBackground(colorScheme))
                             .frame(width: 40, height: 40)
                             .overlay(
                                 Image(systemName: "ellipsis")
                                     .font(.system(size: 20, weight: .medium))
-                                    .foregroundColor(ColorConstants.buttonContent)
+                                    .foregroundColor(ColorConstants.buttonContent(colorScheme))
                             )
                     }
                     
@@ -68,9 +69,9 @@ struct ControlBar: View {
                     Button(action: flipCamera) {
                         Image(systemName: "camera.rotate")
                             .font(.system(size: 24, weight: .medium))
-                            .foregroundColor(ColorConstants.buttonContent)
+                            .foregroundColor(ColorConstants.buttonContent(colorScheme))
                             .padding(10)
-                            .background(ColorConstants.buttonBackground)
+                            .background(ColorConstants.dynamicButtonBackground(colorScheme))
                             .clipShape(Circle())
                     }
                 }
@@ -87,15 +88,16 @@ struct ControlBar: View {
                     // Audio recording button with mic icons that change based on state
                     ZStack {
                         Circle()
-                            .fill(isHandsFree ? (isAudioEnabled ? Color.blue : ColorConstants.buttonBackgroundInactive)
-                                               : (isRecording ? Color.blue : ColorConstants.buttonBackgroundInactive))
+                            .fill(isHandsFree ?
+                                  (isAudioEnabled ? Color.blue : ColorConstants.buttonBackgroundInactive(colorScheme)) :
+                                  (isRecording ? Color.blue : ColorConstants.buttonBackgroundInactive(colorScheme)))
                             .frame(width: buttonSize, height: buttonSize)
-                            .shadow(color: .gray.opacity(0.4), radius: 4, x: 0, y: 2)
+                            .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 4, x: 0, y: 2)
                         
                         if isHandsFree {
                             Image(systemName: isAudioEnabled ? "mic.fill" : "mic.slash.fill")
                                 .font(.system(size: 28, weight: .semibold))
-                                .foregroundColor(isAudioEnabled ? .white : ColorConstants.buttonContent)
+                                .foregroundColor(isAudioEnabled ? .white : ColorConstants.buttonContent(colorScheme))
                         } else {
                             if isRecording {
                                 Image(systemName: "stop.fill")
@@ -104,7 +106,7 @@ struct ControlBar: View {
                             } else {
                                 Image(systemName: "play.fill")
                                     .font(.system(size: 28, weight: .semibold))
-                                    .foregroundColor(ColorConstants.buttonContent)
+                                    .foregroundColor(ColorConstants.buttonContent(colorScheme))
                             }
                         }
                     }
@@ -160,9 +162,9 @@ struct ControlBar: View {
         .background(
             Group {
                 if currentConfiguration != .disconnected {
-                    ColorConstants.controlBackgroundWithMaterial()
+                    ColorConstants.controlBackgroundWithMaterial(colorScheme)
                         .cornerRadius(24)
-                        .shadow(color: ColorConstants.buttonShadow, radius: 10, x: 0, y: 5)
+                        .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 10, x: 0, y: 5)
                 }
             }
         )
@@ -325,8 +327,82 @@ struct ControlBar: View {
 
 
 // Modernized local audio visualizer
+struct RoundControlButton: View {
+    var iconName: String
+    var action: () -> Void
+    var isActive: Bool
+    var primaryColor: Color
+    var size: CGFloat = 60
+    var fontSize: CGFloat = 22
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    // Use a contrasting color if inactive
+                    .fill(isActive ? primaryColor : ColorConstants.buttonBackgroundInactive(colorScheme))
+                    .frame(width: size, height: size)
+                    .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 5, x: 0, y: 2)
+                
+                Image(systemName: iconName)
+                    .font(.system(size: fontSize, weight: .semibold))
+                    .foregroundColor(isActive ? .white : ColorConstants.buttonContent(colorScheme))
+            }
+        }
+        .buttonStyle(.plain)
+        // If active, add a subtle glow or keep it clear if inactive
+        .shadow(color: isActive ? primaryColor.opacity(colorScheme == .dark ? 0.6 : 0.4) : Color.clear,
+                radius: 5, x: 0, y: 3)
+    }
+}
+
+// Improved start call button with audio wave icon matching the design in screenshot
+struct UnstyledStartCallButton: View {
+    var connectAction: () -> Void
+    
+    var body: some View {
+        Button(action: connectAction) {
+            ZStack {
+                // Larger circle with standard blue color
+                Circle()
+                    .fill(ColorConstants.connectButtonBackground)
+                    .frame(width: 120, height: 120)
+                    // Add standard shadow for better visibility
+                    .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
+                
+                // Audio wave bars with bigger inner area
+                HStack(spacing: 4) {
+                    ForEach(0..<5) { i in
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(Color.white)
+                            .frame(width: 4, height: getBarHeight(for: i))
+                    }
+                }
+                .scaleEffect(1.3) // Scale up the audio wave pattern to make it more prominent
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    // Function with increased heights for audio wave bars
+    private func getBarHeight(for index: Int) -> CGFloat {
+        switch index {
+        case 0: return 18
+        case 1: return 30
+        case 2: return 42
+        case 3: return 30
+        case 4: return 18
+        default: return 24
+        }
+    }
+}
+
+// Modernized local audio visualizer with dark mode support
 struct LocalAudioVisualizer: View {
     var track: AudioTrack?
+    @Environment(\.colorScheme) private var colorScheme
     
     @StateObject private var audioProcessor: AudioProcessor
     
@@ -341,10 +417,10 @@ struct LocalAudioVisualizer: View {
     
     public var body: some View {
         ZStack {
-            // Use the visualizerBackground from ColorConstants
+            // Use the dynamic visualizer background
             RoundedRectangle(cornerRadius: 12)
-                .fill(ColorConstants.visualizerBackground)
-                .shadow(color: ColorConstants.buttonShadow, radius: 3, x: 0, y: 1)
+                .fill(ColorConstants.visualizerBackground(colorScheme))
+                .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 3, x: 0, y: 1)
             
             // Audio visualization bars
             HStack(spacing: 4) {
@@ -352,7 +428,10 @@ struct LocalAudioVisualizer: View {
                     Capsule()
                         .fill(
                             LinearGradient(
-                                colors: [ColorConstants.toggleActiveColor.opacity(0.5), ColorConstants.toggleActiveColor.opacity(0.8)],
+                                colors: [
+                                    ColorConstants.toggleActiveColor.opacity(colorScheme == .dark ? 0.7 : 0.5),
+                                    ColorConstants.toggleActiveColor.opacity(colorScheme == .dark ? 1.0 : 0.8)
+                                ],
                                 startPoint: .bottom,
                                 endPoint: .top
                             )
@@ -369,81 +448,10 @@ struct LocalAudioVisualizer: View {
     }
 }
 
-// Modern round control button
-struct RoundControlButton: View {
-    var iconName: String
-    var action: () -> Void
-    var isActive: Bool
-    var primaryColor: Color
-    var size: CGFloat = 60
-    var fontSize: CGFloat = 22
-    
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    // Use a contrasting color if inactive
-                    .fill(isActive ? primaryColor : ColorConstants.buttonBackgroundInactive)
-                    .frame(width: size, height: size)
-                    .shadow(color: ColorConstants.buttonShadow, radius: 5, x: 0, y: 2)
-                
-                Image(systemName: iconName)
-                    .font(.system(size: fontSize, weight: .semibold))
-                    .foregroundColor(isActive ? .white : ColorConstants.buttonContent)
-            }
-        }
-        .buttonStyle(.plain)
-        // If active, add a subtle glow or keep it clear if inactive
-        .shadow(color: isActive ? primaryColor.opacity(0.4) : Color.clear,
-                radius: 5, x: 0, y: 3)
-    }
-}
-
-
-// Improved start call button with audio wave icon matching the design in screenshot
-struct UnstyledStartCallButton: View {
-    var connectAction: () -> Void
-    
-    var body: some View {
-        Button(action: connectAction) {
-            ZStack {
-                // Larger circle with standard blue color
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 120, height: 120) // Increased from 110 to 120
-                    // Add standard shadow for better visibility
-                    .shadow(color: ColorConstants.connectButtonBackground, radius: 8, x: 0, y: 4)
-                
-                // Audio wave bars with bigger inner area
-                HStack(spacing: 4) { // Increased spacing from 3 to 4
-                    ForEach(0..<5) { i in
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(Color.white)
-                            .frame(width: 4, height: getBarHeight(for: i)) // Increased width from 3 to 4
-                    }
-                }
-                .scaleEffect(1.3) // Scale up the audio wave pattern to make it more prominent
-            }
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    // Function with increased heights for audio wave bars
-    private func getBarHeight(for index: Int) -> CGFloat {
-        switch index {
-        case 0: return 18 // From 15
-        case 1: return 30 // From 25
-        case 2: return 42 // From 35
-        case 3: return 30 // From 25
-        case 4: return 18 // From 15
-        default: return 24 // From 20
-        }
-    }
-}
-
-// Transition indicator
+// Transition indicator with dark mode support
 struct TransitionIndicator: View {
     var isConnecting: Bool
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         HStack {
@@ -453,12 +461,14 @@ struct TransitionIndicator: View {
             
             Text(isConnecting ? "Connecting..." : "Disconnecting...")
                 .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.secondary)
+                .foregroundColor(colorScheme == .dark ? .white : .secondary)
                 .padding(.leading, 8)
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 24)
-        .background(Color(.systemGray6).opacity(0.8))
+        .background(colorScheme == .dark ?
+                    Color(.systemGray6).opacity(0.4) :
+                    Color(.systemGray6).opacity(0.8))
         .cornerRadius(20)
     }
 }

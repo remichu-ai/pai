@@ -35,9 +35,19 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Adaptive background color based on color scheme
-            (colorScheme == .dark ? Color.black : Color(UIColor.systemBackground))
+            // Dynamic background color based on color scheme
+            ColorConstants.dynamicBackground(colorScheme)
                 .edgesIgnoringSafeArea(.all)
+            
+            if showingAdditionalSettings {
+                Color.black.opacity(0.001) // Nearly transparent - just to capture taps
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showingAdditionalSettings = false
+                        }
+                    }
+            }
             
             if room.connectionState == .connected {
                 // CONNECTED MODE
@@ -52,9 +62,9 @@ struct ContentView: View {
                         Button(action: { showingToolSettings.toggle() }) {
                             Image(systemName: "wrench")
                                 .font(.system(size: 20))
-                                .foregroundColor(Color("ButtonColor"))
+                                .foregroundColor(ColorConstants.buttonContent(colorScheme))
                                 .frame(width: 44, height: 44)
-                                .background(Color("ButtonBackgroundColor"))
+                                .background(ColorConstants.dynamicButtonBackground(colorScheme))
                                 .clipShape(Circle())
                         }
                         .padding(.trailing, 8)
@@ -62,9 +72,9 @@ struct ContentView: View {
                         Button(action: { showingSettings.toggle() }) {
                             Image(systemName: "gear")
                                 .font(.system(size: 20))
-                                .foregroundColor(Color("ButtonColor"))
+                                .foregroundColor(ColorConstants.buttonContent(colorScheme))
                                 .frame(width: 44, height: 44)
-                                .background(Color("ButtonBackgroundColor"))
+                                .background(ColorConstants.dynamicButtonBackground(colorScheme))
                                 .clipShape(Circle())
                         }
                         .padding(.trailing, 16)
@@ -115,9 +125,9 @@ struct ContentView: View {
                         Button(action: { showingSettings.toggle() }) {
                             Image(systemName: "gear")
                                 .font(.system(size: 20))
-                                .foregroundColor(Color("ButtonColor"))
+                                .foregroundColor(colorScheme == .dark ? .white.opacity(0.9) : ColorConstants.buttonContent(colorScheme))
                                 .frame(width: 44, height: 44)
-                                .background(Color("ButtonBackgroundColor"))
+                                .background(ColorConstants.dynamicButtonBackground(colorScheme))
                                 .clipShape(Circle())
                         }
                         .padding(.trailing, 16)
@@ -236,7 +246,9 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.2), value: isConnecting)
     }
     
+    // startConversation function remains the same
     private func startConversation() {
+        // Existing implementation
         if serverUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             showingMissingUrlAlert = true
             return
@@ -323,6 +335,7 @@ struct ContentView: View {
 // New HandsFreeView to replace HoldToTalkView
 struct HandsFreeView: View {
     @Binding var isHandsFree: Bool
+    @Environment(\.colorScheme) private var colorScheme
     var showLabel: Bool = true
     
     var body: some View {
@@ -333,19 +346,20 @@ struct HandsFreeView: View {
                     HStack(spacing: 4) {
                         Image(systemName: isHandsFree ? "hand.raised.slash.fill" : "hand.raised.slash")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor)
+                            .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor(for: colorScheme))
                         
                         Text("Hands-free")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(ColorConstants.buttonContent)
+                            .foregroundColor(colorScheme == .dark ? .white : ColorConstants.buttonContent(colorScheme))
                     }
                 }
             } else {
                 // Simple icon-only version - for ControlBar
                 Image(systemName: isHandsFree ? "hand.raised.slash.fill" : "hand.raised.slash")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor)
+                    .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor(for: colorScheme))
             }
+        
             
             Toggle("", isOn: $isHandsFree)
                 .toggleStyle(SwitchToggleStyle(tint: ColorConstants.toggleActiveColor))
@@ -354,10 +368,15 @@ struct HandsFreeView: View {
         }
         .padding(.vertical, showLabel ? 8 : 4)
         .padding(.horizontal, showLabel ? 12 : 8)
-        .background(showLabel ? ColorConstants.buttonBackground : Color.clear)
+        .background(showLabel ? ColorConstants.dynamicButtonBackground(colorScheme) : Color.clear)
         .cornerRadius(16)
-        // Reduced shadow opacity for less contrast
-        .shadow(color: showLabel ? ColorConstants.buttonShadow.opacity(0.25) : Color.clear, radius: 2, x: 0, y: 1)
+        // Reduced shadow opacity for dark mode
+        .shadow(
+            color: showLabel ? ColorConstants.buttonShadow(colorScheme) : Color.clear,
+            radius: 2,
+            x: 0,
+            y: 1
+        )
     }
 }
 

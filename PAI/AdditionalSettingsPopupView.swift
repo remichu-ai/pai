@@ -7,6 +7,7 @@ struct AdditionalSettingsPopup: View {
     @Binding var isHandsFree: Bool
     @Binding var isRecording: Bool    // <<-- Binding for recording state
     @EnvironmentObject var sessionConfigStore: SessionConfigStore
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -14,16 +15,19 @@ struct AdditionalSettingsPopup: View {
                 HStack(spacing: 8) {
                     Image(systemName: "text.bubble")
                         .font(.system(size: 16))
-                        .foregroundColor(isTranscriptVisible ? ColorConstants.toggleActiveColor : ColorConstants.buttonContent)
+                        .foregroundColor(isTranscriptVisible ?
+                            ColorConstants.toggleActiveColor :
+                            ColorConstants.buttonContent(colorScheme))
                     
                     Text("Transcript")
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(ColorConstants.buttonContent)
+                        .foregroundColor(colorScheme == .dark ? .white : ColorConstants.buttonContent(colorScheme))
                 }
             }
             .toggleStyle(SwitchToggleStyle(tint: ColorConstants.toggleActiveColor))
             
             Divider()
+                .background(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.gray.opacity(0.2))
             
             Toggle(isOn: Binding(
                 get: { isHandsFree },
@@ -42,11 +46,13 @@ struct AdditionalSettingsPopup: View {
                 HStack(spacing: 8) {
                     Image(systemName: "hand.raised.slash")
                         .font(.system(size: 16))
-                        .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.buttonContent)
+                        .foregroundColor(isHandsFree ?
+                            ColorConstants.toggleActiveColor :
+                            ColorConstants.buttonContent(colorScheme))
                     
                     Text("Hands-free")
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(ColorConstants.buttonContent)
+                        .foregroundColor(colorScheme == .dark ? .white : ColorConstants.buttonContent(colorScheme))
                 }
             }
             .toggleStyle(SwitchToggleStyle(tint: ColorConstants.toggleActiveColor))
@@ -56,8 +62,18 @@ struct AdditionalSettingsPopup: View {
         .frame(width: 220)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(UIColor.systemBackground))
-                .shadow(color: ColorConstants.buttonShadow, radius: 10, x: 0, y: 5)
+                .fill(colorScheme == .dark ?
+                      ColorConstants.darkModeCardBackground :
+                      Color(UIColor.systemBackground))
+                .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 10, x: 0, y: 5)
+        )
+        // Add a subtle border in dark mode to better define the popup
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    colorScheme == .dark ? Color.gray.opacity(0.2) : Color.clear,
+                    lineWidth: 0.5
+                )
         )
         .onAppear {
             // Initialize the hands-free state from the session config when the view appears

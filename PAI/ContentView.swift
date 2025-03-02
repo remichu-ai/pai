@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var isAudioEnabled: Bool = false
     @State private var isRecording: Bool = false
     @AppStorage("serverUrl") private var serverUrl: String = ""
+    @AppStorage("authenticationUrl") private var authenticationUrl: String = ""
     @EnvironmentObject private var tokenService: TokenService
 
     @State private var showingSettings: Bool = false
@@ -209,6 +210,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingSettings) {
             SettingView(
                 serverUrl: $serverUrl,
+                authenticationUrl: $authenticationUrl,
                 sessionConfig: $sessionConfigStore.sessionConfig
             )
             .onDisappear {

@@ -8,23 +8,30 @@ struct ConnectionDetails: Codable {
 }
 
 class TokenService: ObservableObject {
+    private var serverUrl: String      // The LiveKit server URL (to be used when connecting)
+    private var apiBaseUrl: String     // The API base URL (previously hardcoded), now from authenticationUrl
+
+    // New initializer that takes in the server and authentication URLs
+    init(serverUrl: String, authenticationUrl: String) {
+        self.serverUrl = serverUrl
+        self.apiBaseUrl = authenticationUrl
+    }
+    
     func fetchConnectionDetails(roomName: String, participantName: String) async throws -> ConnectionDetails? {
         if let apiConnectionDetails = try await fetchConnectionDetailsFromAPI(roomName: roomName, participantName: participantName) {
             return apiConnectionDetails
         }
-
         return try await fetchConnectionDetailsFromSandbox(roomName: roomName, participantName: participantName)
     }
-
-    private let apiBaseUrl: String = "http://100.123.119.59:3111" // Replace with your API base URL
 
     private func fetchConnectionDetailsFromAPI(roomName: String, participantName: String) async throws -> ConnectionDetails? {
         guard let token = try await fetchTokenFromAPI() else {
             return nil
         }
-
-        return .init(
-            serverUrl: "http://100.123.119.59:7880", // Replace with your LiveKit server URL
+        
+        // Now using the injected serverUrl instead of a hardcoded value.
+        return ConnectionDetails(
+            serverUrl: serverUrl,
             roomName: roomName,
             participantName: participantName,
             participantToken: token
@@ -32,28 +39,26 @@ class TokenService: ObservableObject {
     }
 
     private func fetchTokenFromAPI() async throws -> String? {
+        // Build the token request using the injected apiBaseUrl (from authenticationUrl)
         let url = URL(string: "\(apiBaseUrl)/getToken")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-
+        
         let (data, response) = try await URLSession.shared.data(for: request)
-
         guard let httpResponse = response as? HTTPURLResponse else {
             debugPrint("Failed to connect to the token API")
             return nil
         }
-
         guard (200 ... 299).contains(httpResponse.statusCode) else {
             debugPrint("Error from token API: \(httpResponse.statusCode), response: \(httpResponse)")
             return nil
         }
-
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
               let token = json["token"] as? String else {
             debugPrint("Error parsing token from API response")
             return nil
         }
-
+        
         return token
     }
 

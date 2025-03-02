@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var serverUrl: String
+    @Binding var authenticationUrl: String
     @Binding var sessionConfig: SessionConfig
     
     // Dictionary mapping language codes to full language names
@@ -146,10 +147,25 @@ struct SettingView: View {
                     
                     // SERVER URL
                     Section {
-                        TextField("Server URL", text: $serverUrl)
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
-                            .keyboardType(.URL)
+                        // Main Server
+                        HStack {
+                            Text("Main Server:")
+                                .frame(width: 120, alignment: .leading)  // Adjust width as needed
+                            TextField("http://100.123.119.59:7880", text: $serverUrl)
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
+                                .keyboardType(.URL)
+                        }
+                        
+                        // Authentication Server
+                        HStack {
+                            Text("Authentication:")
+                                .frame(width: 120, alignment: .leading)
+                            TextField("http://100.123.119.59:3111", text: $authenticationUrl)
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
+                                .keyboardType(.URL)
+                        }
                     } header: {
                         VStack(alignment: .leading) {
                             Text("Server URL")
@@ -568,13 +584,3 @@ struct SearchBar: View {
     }
 }
 
-// Preview Provider
-struct SettingView_Previews: PreviewProvider {
-    static var previews: some View {
-        // Use a constant binding for the preview
-        SettingView(
-            serverUrl: .constant("https://10.10.10.10:3111"),
-            sessionConfig: .constant(SessionConfig())
-        )
-    }
-}

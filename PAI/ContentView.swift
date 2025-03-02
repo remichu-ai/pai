@@ -8,6 +8,7 @@ struct ContentView: View {
     
     @State private var isVideoEnabled: Bool = false
     @State private var isAudioEnabled: Bool = false
+    @State private var isRecording: Bool = false
     @AppStorage("serverUrl") private var serverUrl: String = ""
     @EnvironmentObject private var tokenService: TokenService
 
@@ -17,11 +18,14 @@ struct ContentView: View {
     @State private var isTranscriptVisible: Bool = false
     @EnvironmentObject var sessionConfigStore: SessionConfigStore
     
-    @State private var isHoldToTalk: Bool = true
+    @State private var isHandsFree: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
     // HOISTED STATE: We show this popup in an overlay at the top level
     @State private var showingAdditionalSettings: Bool = false
+    
+    // New state for connection loading
+    @State private var isConnecting: Bool = false
 
     init() {
         let delegate = TranscriptionDelegate()
@@ -35,7 +39,6 @@ struct ContentView: View {
             (colorScheme == .dark ? Color.black : Color(UIColor.systemBackground))
                 .edgesIgnoringSafeArea(.all)
             
-            // Layout depends on connection state
             if room.connectionState == .connected {
                 // CONNECTED MODE
                 VStack(spacing: 0) {
@@ -87,15 +90,14 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // Controls at bottom
+                    // Pass down the isRecording binding here.
                     ControlBar(
                         onStartConversation: startConversation,
                         isAudioEnabled: $isAudioEnabled,
                         isVideoEnabled: $isVideoEnabled,
                         isTranscriptVisible: $isTranscriptVisible,
-                        isHoldToTalk: $isHoldToTalk,
-                        
-                        // NEW: pass a closure to toggle the popup
+                        isHandsFree: $isHandsFree,
+                        isRecording: $isRecording,
                         onToggleAdditionalSettings: {
                             withAnimation(.easeInOut(duration: 0.1)) {
                                 showingAdditionalSettings.toggle()
@@ -108,7 +110,6 @@ struct ContentView: View {
             } else {
                 // DISCONNECTED MODE
                 VStack(spacing: 0) {
-                    // Top bar
                     HStack {
                         Spacer()
                         Button(action: { showingSettings.toggle() }) {
@@ -144,35 +145,56 @@ struct ContentView: View {
                             isAudioEnabled: $isAudioEnabled,
                             isVideoEnabled: $isVideoEnabled,
                             isTranscriptVisible: $isTranscriptVisible,
-                            isHoldToTalk: $isHoldToTalk,
-                            
-                            // same closure for toggling
+                            isHandsFree: $isHandsFree,
+                            isRecording: $isRecording,
                             onToggleAdditionalSettings: {
-                                withAnimation(.spring(
-                                    response: 0.15
-                                )) {
+                                withAnimation(.spring(response: 0.15)) {
                                     showingAdditionalSettings.toggle()
                                 }
                             }
                         )
                         
-                        HoldToTalkView(isHoldToTalk: $isHoldToTalk)
+                        HandsFreeView(isHandsFree: $isHandsFree)
                             .padding(.top, 20)
                     }
                     
                     Spacer().frame(height: 100)
                 }
                 .padding(.horizontal)
+                .disabled(isConnecting) // Disable UI during connection
+            }
+            
+            // Loading overlay that appears during connection in non-hands-free mode
+            if isConnecting {
+                ZStack {
+                    Color.black.opacity(0.5)
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.5)
+                        
+                        Text("Initializing connection...")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                    .padding(24)
+                    .background(Color(.systemGray6).opacity(0.7))
+                    .cornerRadius(12)
+                }
+                .transition(.opacity)
             }
         }
         .edgesIgnoringSafeArea(.bottom)
         .environmentObject(room)
         .onAppear {
-            // Any additional onAppear logic
+            isHandsFree = sessionConfigStore.sessionConfig.turnDetection.createResponse
         }
-        .onChange(of: isHoldToTalk) { newValue in
+        .onChange(of: isHandsFree) { newValue in
+            // When hands-free changes, update the session config.
+            // (Any additional logic to stop recording should already occur via the popup below.)
             sessionConfigStore.sessionConfig.turnDetection.createResponse = newValue
-            sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
         }
         .sheet(isPresented: $showingSettings) {
             SettingView(
@@ -196,22 +218,22 @@ struct ContentView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
-        
         // TOP-LEVEL OVERLAY FOR ADDITIONAL SETTINGS
         .overlay(alignment: .bottomLeading) {
             if showingAdditionalSettings {
                 AdditionalSettingsPopup(
+                    room: room,
                     isTranscriptVisible: $isTranscriptVisible,
-                    isHoldToTalk: $isHoldToTalk
+                    isHandsFree: $isHandsFree,
+                    isRecording: $isRecording    // <<-- Pass the binding so we can reset it when needed
                 )
-                // Position it above the control bar:
                 .padding(.leading, 16)
                 .padding(.bottom, 130)
-                // Adjust '120' to your preference so it sits nicely above the ControlBar
                 .transition(.scale(scale: 0.9, anchor: .bottomLeading))
                 .zIndex(999)
             }
         }
+        .animation(.easeInOut(duration: 0.2), value: isConnecting)
     }
     
     private func startConversation() {
@@ -225,6 +247,11 @@ struct ContentView: View {
             let participantName = "user-\(Int.random(in: 1000 ... 9999))"
             
             do {
+                // Set connecting state to true and show loading overlay
+                await MainActor.run {
+                    isConnecting = true
+                }
+                
                 if let connectionDetails = try await tokenService.fetchConnectionDetails(
                     roomName: roomName,
                     participantName: participantName
@@ -238,25 +265,99 @@ struct ContentView: View {
                             )
                         )
                     )
-                    // start audio live stream if Hold-to-Talk not selected
-                    if isHoldToTalk == false {
-                        try await room.localParticipant.setMicrophone(enabled: true, captureOptions: AudioCaptureOptions(
-                            echoCancellation: true,
-                            autoGainControl: true,
-                            noiseSuppression: true,
-                            highpassFilter: true
-                        ))
+                    
+                    // Get the audio capture options
+                    let captureOptions = AudioCaptureOptions(
+                        echoCancellation: true,
+                        autoGainControl: true,
+                        noiseSuppression: true,
+                        highpassFilter: true
+                    )
+                    
+                    // In both modes, always start the microphone initially
+                    try await room.localParticipant.setMicrophone(enabled: true, captureOptions: captureOptions)
+                    await MainActor.run {
                         isAudioEnabled = true
-                    } else {
-                        isAudioEnabled = false
                     }
+                    
+                    // If not in hands-free mode, we need to disable the microphone after 1 second
+                    if !isHandsFree {
+                        // Wait for 0.2 second
+                        try await Task.sleep(nanoseconds: 200_000_000)
+                        
+                        // Then disable the microphone
+                        try await room.localParticipant.setMicrophone(enabled: false)
+                        await MainActor.run {
+                            isAudioEnabled = false
+                        }
+                    }
+                    
+                    sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                    
                 } else {
                     print("Failed to fetch connection details")
                 }
+                
+                // Finally, regardless of the outcome, update the UI state
+                await MainActor.run {
+                    isConnecting = false
+                }
+                
             } catch {
                 print("Connection error: \(error)")
+                await MainActor.run {
+                    isConnecting = false
+                }
             }
         }
+    }
+}
+
+#Preview {
+    ContentView()
+        .environmentObject(Room())
+        .environmentObject(SessionConfigStore())
+}
+
+
+// New HandsFreeView to replace HoldToTalkView
+struct HandsFreeView: View {
+    @Binding var isHandsFree: Bool
+    var showLabel: Bool = true
+    
+    var body: some View {
+        HStack(spacing: 10) {
+            if showLabel {
+                // Version with label - for ContentView
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 4) {
+                        Image(systemName: isHandsFree ? "hand.raised.slash.fill" : "hand.raised.slash")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor)
+                        
+                        Text("Hands-free")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(ColorConstants.buttonContent)
+                    }
+                }
+            } else {
+                // Simple icon-only version - for ControlBar
+                Image(systemName: isHandsFree ? "hand.raised.slash.fill" : "hand.raised.slash")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.toggleInactiveColor)
+            }
+            
+            Toggle("", isOn: $isHandsFree)
+                .toggleStyle(SwitchToggleStyle(tint: ColorConstants.toggleActiveColor))
+                .labelsHidden()
+                .scaleEffect(0.9)
+        }
+        .padding(.vertical, showLabel ? 8 : 4)
+        .padding(.horizontal, showLabel ? 12 : 8)
+        .background(showLabel ? ColorConstants.buttonBackground : Color.clear)
+        .cornerRadius(16)
+        // Reduced shadow opacity for less contrast
+        .shadow(color: showLabel ? ColorConstants.buttonShadow.opacity(0.25) : Color.clear, radius: 2, x: 0, y: 1)
     }
 }
 

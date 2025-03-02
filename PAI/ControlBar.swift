@@ -10,14 +10,14 @@ struct ControlBar: View {
     @Binding var isAudioEnabled: Bool
     @Binding var isVideoEnabled: Bool
     @Binding var isTranscriptVisible: Bool
-    @Binding var isHoldToTalk: Bool
+    @Binding var isHandsFree: Bool
+    @Binding var isRecording: Bool    // <<-- Now passed as a binding
     var onToggleAdditionalSettings: () -> Void
     
     @State private var isScreenSharingEnabled: Bool = false
     @State private var isConnecting: Bool = false
     @State private var isDisconnecting: Bool = false
     @State private var cameraPosition: AVCaptureDevice.Position = .back
-    @State private var isRecording: Bool = false
     
     let buttonSize: CGFloat = 70
     let buttonFontSize: CGFloat = 22
@@ -84,49 +84,37 @@ struct ControlBar: View {
                 
             case .connected:
                 HStack(spacing: 28) {
-                    if isHoldToTalk {
-                        ZStack {
-                            Circle()
-                                .fill(isRecording ? ColorConstants.holdToTalkActive : ColorConstants.holdToTalkIdle)
-                                .frame(width: buttonSize, height: buttonSize)
-                                .shadow(color: .gray.opacity(0.4), radius: 4, x: 0, y: 2)
-                            
+                    // Audio recording button with mic icons that change based on state
+                    ZStack {
+                        Circle()
+                            .fill(isHandsFree ? (isAudioEnabled ? Color.blue : ColorConstants.buttonBackgroundInactive)
+                                               : (isRecording ? Color.blue : ColorConstants.buttonBackgroundInactive))
+                            .frame(width: buttonSize, height: buttonSize)
+                            .shadow(color: .gray.opacity(0.4), radius: 4, x: 0, y: 2)
+                        
+                        if isHandsFree {
+                            Image(systemName: isAudioEnabled ? "mic.fill" : "mic.slash.fill")
+                                .font(.system(size: 28, weight: .semibold))
+                                .foregroundColor(isAudioEnabled ? .white : ColorConstants.buttonContent)
+                        } else {
                             if isRecording {
                                 Image(systemName: "stop.fill")
                                     .font(.system(size: 28, weight: .semibold))
                                     .foregroundColor(.white)
                             } else {
-                                Image(systemName: "mic.circle.fill")
-                                    .font(.system(size: 32, weight: .bold))
-                                    .foregroundColor(.white)
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 28, weight: .semibold))
+                                    .foregroundColor(ColorConstants.buttonContent)
                             }
                         }
-                        // Define the hit area explicitly with contentShape.
-                        .contentShape(Circle())
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { _ in
-                                    // On touch down, start recording.
-                                    if !isRecording {
-                                        setRecording(to: true)
-                                    }
-                                }
-                                .onEnded { _ in
-                                    // On touch up, stop recording.
-                                    if isRecording {
-                                        setRecording(to: false)
-                                    }
-                                }
-                        )
-                    } else {
-                        RoundControlButton(
-                            iconName: isAudioEnabled ? "mic.fill" : "mic.slash.fill",
-                            action: { toggleAudio(toggleMode: .toggle) },
-                            isActive: isAudioEnabled,
-                            primaryColor: .blue,
-                            size: buttonSize,
-                            fontSize: buttonFontSize
-                        )
+                    }
+                    .contentShape(Circle())
+                    .onTapGesture {
+                        if isHandsFree {
+                            toggleAudio(toggleMode: .toggle)
+                        } else {
+                            setRecording(to: !isRecording)
+                        }
                     }
                     
                     RoundControlButton(
@@ -181,43 +169,71 @@ struct ControlBar: View {
         .animation(nil, value: currentConfiguration)
     }
     
-    // MARK: - Standardized Recording Method
     private func setRecording(to shouldRecord: Bool) {
         Task {
+            print("Setting recording to: \(shouldRecord)")
+            print("Current recording state: \(isRecording)")
+            
             if shouldRecord && !isRecording {
-                // Start recording.
-                isRecording = true
-                let captureOptions = AudioCaptureOptions(
-                    echoCancellation: true,
-                    autoGainControl: true,
-                    noiseSuppression: true,
-                    highpassFilter: true
-                )
-                try await room.localParticipant.setMicrophone(enabled: true, captureOptions: captureOptions)
-                isAudioEnabled = true
-            } else if !shouldRecord && isRecording {
-                // Stop recording.
-                isRecording = false
-                try await room.localParticipant.setMicrophone(enabled: false)
-                isAudioEnabled = false
+                // First enable the microphone using the existing toggleAudio method
+                print("Enabling microphone via toggleAudio...")
+                try await toggleAudio(toggleMode: .on)
                 
-                // Trigger conversation creation logic.
-                do {
-                    let result = try await createConversation(room: room)
-                    switch result {
-                    case .success(let response):
-                        print("Successfully created conversation: \(response)")
-                    case .failure(let error):
-                        print("Failed to create conversation: \(error)")
-                    }
-                } catch {
-                    print("Error creating conversation: \(error)")
+                // Log track state for debugging - using public API methods
+                let audioTracks = room.localParticipant.localAudioTracks
+                if !audioTracks.isEmpty {
+                    let audioTrack = audioTracks.first!
+                    print("Audio track successfully published with sid: \(audioTrack.sid)")
+                    print("Audio track muted state: \(audioTrack.isMuted)")
+                } else {
+                    print("Warning: No audio track publication found after enabling microphone")
                 }
+                
+                // Then interrupt agent (after audio is enabled)
+                print("Interrupting agent...")
+                let result = try await interruptAgent(room: self.room)
+                switch result {
+                    case .success(let message):
+                        print("Successfully interrupted agent: \(message)")
+                    case .failure(let error):
+                        print("Failed to interrupt agent: \(error)")
+                        // Continue with recording even if interrupt fails
+                }
+                
+                // Set recording state last, after audio is confirmed working
+                isRecording = true
+                print("Recording started successfully")
+                
+            } else if !shouldRecord && isRecording {
+                // First update recording state
+                isRecording = false
+                print("Stopping recording...")
+                
+                // Then disable microphone using toggleAudio for consistency
+                try await toggleAudio(toggleMode: .off)
+                print("Microphone disabled via toggleAudio")
+                
+                // Only create conversation if not in hands-free mode
+                if !isHandsFree {
+                    print("Creating conversation...")
+                    do {
+                        let result = try await createConversation(room: room)
+                        switch result {
+                        case .success(let response):
+                            print("Successfully created conversation: \(response)")
+                        case .failure(let error):
+                            print("Failed to create conversation: \(error)")
+                        }
+                    } catch {
+                        print("Error creating conversation: \(error)")
+                    }
+                }
+                
+                print("Recording stopped successfully")
             }
         }
     }
     
-    // Other toggle and helper functions remain the same.
     enum ToggleMode: String {
         case on = "on"
         case off = "off"
@@ -298,7 +314,6 @@ struct ControlBar: View {
             await room.disconnect()
             isDisconnecting = false
 
-            // Reset flags
             isAudioEnabled = false
             isVideoEnabled = false
             isScreenSharingEnabled = false

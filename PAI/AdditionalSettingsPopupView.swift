@@ -1,8 +1,12 @@
 import SwiftUI
+import LiveKit
 
 struct AdditionalSettingsPopup: View {
+    var room: Room
     @Binding var isTranscriptVisible: Bool
-    @Binding var isHoldToTalk: Bool
+    @Binding var isHandsFree: Bool
+    @Binding var isRecording: Bool    // <<-- Binding for recording state
+    @EnvironmentObject var sessionConfigStore: SessionConfigStore
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -21,13 +25,26 @@ struct AdditionalSettingsPopup: View {
             
             Divider()
             
-            Toggle(isOn: $isHoldToTalk) {
-                HStack(spacing: 8) {
-                    Image(systemName: "hand.tap")
-                        .font(.system(size: 16))
-                        .foregroundColor(isHoldToTalk ? ColorConstants.toggleActiveColor : ColorConstants.buttonContent)
+            Toggle(isOn: Binding(
+                get: { isHandsFree },
+                set: { newValue in
+                    isHandsFree = newValue
+                    sessionConfigStore.sessionConfig.turnDetection.createResponse = newValue
+                    // If switching to non-hands-free mode, reset recording (stop recording)
+                    if !newValue {
+                        isRecording = false
+                    }
                     
-                    Text("Hold to Talk")
+                    // Send updated config to backend
+                    sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                }
+            )) {
+                HStack(spacing: 8) {
+                    Image(systemName: "hand.raised.slash")
+                        .font(.system(size: 16))
+                        .foregroundColor(isHandsFree ? ColorConstants.toggleActiveColor : ColorConstants.buttonContent)
+                    
+                    Text("Hands-free")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(ColorConstants.buttonContent)
                 }
@@ -39,10 +56,40 @@ struct AdditionalSettingsPopup: View {
         .frame(width: 220)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
+                .fill(Color(UIColor.systemBackground))
                 .shadow(color: ColorConstants.buttonShadow, radius: 10, x: 0, y: 5)
         )
-        // This is a self-contained component that doesn't position itself
-        // Positioning will be handled by the parent view
+        .onAppear {
+            // Initialize the hands-free state from the session config when the view appears
+            isHandsFree = sessionConfigStore.sessionConfig.turnDetection.createResponse
+        }
     }
 }
+
+//// Preview provider for SwiftUI Canvas
+//struct AdditionalSettingsPopup_Previews: PreviewProvider {
+//    static var previews: some View {
+//        AdditionalSettingsPopup(
+//            room: Room,
+//            isTranscriptVisible: .constant(true),
+//            isHandsFree: .constant(true),
+//            isRecording: .constant(false)
+//        )
+//        .environmentObject(SessionConfigStore())
+//        .environmentObject(Room())
+//        .previewLayout(.sizeThatFits)
+//        .padding()
+//        .preferredColorScheme(.light)
+//        
+//        AdditionalSettingsPopup(
+//            isTranscriptVisible: .constant(true),
+//            isHandsFree: .constant(false),
+//            isRecording: .constant(false)
+//        )
+//        .environmentObject(SessionConfigStore())
+//        .environmentObject(Room())
+//        .previewLayout(.sizeThatFits)
+//        .padding()
+//        .preferredColorScheme(.dark)
+//    }
+//}

@@ -3,9 +3,9 @@ import LiveKit
 
 func sendSessionConfigToBackend(_ sessionConfig: SessionConfig, room: Room) {
     Task {
-        print("Participant count: \(room.participantCount)")
-        print("All participants: \(room.allParticipants)")
-        print("Remote participants: \(room.remoteParticipants)")
+//        print("Participant count: \(room.participantCount)")
+//        print("All participants: \(room.allParticipants)")
+//        print("Remote participants: \(room.remoteParticipants)")
         
         guard let payload = serialize(sessionConfig) else {
             print("Serialization failed")

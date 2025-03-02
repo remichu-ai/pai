@@ -8,4 +8,14 @@ struct TurnDetectionConfig: Codable {
     var createResponse: Bool = true
     var language: [String] = ["en", "vi"]
     var factorPrefixPaddingInTruncate: Bool = true
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case threshold
+        case prefixPaddingMs = "prefix_padding_ms"
+        case silenceDurationMs = "silence_duration_ms"
+        case createResponse = "create_response"
+        case language
+        case factorPrefixPaddingInTruncate = "factor_prefix_padding_in_truncate"
+    }
 }

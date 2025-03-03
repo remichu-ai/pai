@@ -20,6 +20,7 @@ func sendSessionConfigToBackend(_ sessionConfig: SessionConfig, room: Room) {
                     payload: payload
                 )
                 print("Update session config response: \(response)")
+                print("update config: \(payload)")
             } else {
                 print("No agent found")
             }

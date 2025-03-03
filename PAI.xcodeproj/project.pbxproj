@@ -9,18 +9,18 @@
 /* Begin PBXBuildFile section */
 		FE09A3512D634B0F00F94248 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A3502D634B0F00F94248 /* LiveKit */; };
 		FE09A3542D634B3900F94248 /* LiveKitComponents in Frameworks */ = {isa = PBXBuildFile; productRef = FE09A3532D634B3900F94248 /* LiveKitComponents */; };
-		FE28BCEE2D6B73F0003AD5A2 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE09A4372D63935F00F94248 /* ReplayKit.framework */; };
-		FE28BCF52D6B73F0003AD5A2 /* broadcast.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		FE28BCFD2D6B76F7003AD5A2 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE28BCFC2D6B76F7003AD5A2 /* LiveKit */; };
+		FE28BDBA2D75CDD4003AD5A2 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE09A4372D63935F00F94248 /* ReplayKit.framework */; };
+		FE28BDC12D75CDD4003AD5A2 /* PAICast.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FE28BDC82D76057C003AD5A2 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE28BDC72D76057C003AD5A2 /* LiveKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FE28BCF32D6B73F0003AD5A2 /* PBXContainerItemProxy */ = {
+		FE28BDBF2D75CDD4003AD5A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FE09A31A2D6346AC00F94248 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = FE28BCEC2D6B73F0003AD5A2;
-			remoteInfo = broadcast;
+			remoteGlobalIDString = FE28BDB82D75CDD4003AD5A2;
+			remoteInfo = PAICast;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -31,7 +31,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				FE28BCF52D6B73F0003AD5A2 /* broadcast.appex in Embed Foundation Extensions */,
+				FE28BDC12D75CDD4003AD5A2 /* PAICast.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -41,7 +41,7 @@
 /* Begin PBXFileReference section */
 		FE09A3222D6346AC00F94248 /* PAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE09A4372D63935F00F94248 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
-		FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = broadcast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PAICast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,12 +52,12 @@
 			);
 			target = FE09A3212D6346AC00F94248 /* PAI */;
 		};
-		FE28BCF92D6B73F0003AD5A2 /* Exceptions for "broadcast" folder in "broadcast" target */ = {
+		FE28BDC52D75CDD4003AD5A2 /* Exceptions for "PAICast" folder in "PAICast" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = FE28BCEC2D6B73F0003AD5A2 /* broadcast */;
+			target = FE28BDB82D75CDD4003AD5A2 /* PAICast */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -70,12 +70,12 @@
 			path = PAI;
 			sourceTree = "<group>";
 		};
-		FE28BCEF2D6B73F0003AD5A2 /* broadcast */ = {
+		FE28BDBB2D75CDD4003AD5A2 /* PAICast */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				FE28BCF92D6B73F0003AD5A2 /* Exceptions for "broadcast" folder in "broadcast" target */,
+				FE28BDC52D75CDD4003AD5A2 /* Exceptions for "PAICast" folder in "PAICast" target */,
 			);
-			path = broadcast;
+			path = PAICast;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -90,12 +90,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE28BCEA2D6B73F0003AD5A2 /* Frameworks */ = {
+		FE28BDB62D75CDD4003AD5A2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FE28BCEE2D6B73F0003AD5A2 /* ReplayKit.framework in Frameworks */,
-				FE28BCFD2D6B76F7003AD5A2 /* LiveKit in Frameworks */,
+				FE28BDBA2D75CDD4003AD5A2 /* ReplayKit.framework in Frameworks */,
+				FE28BDC82D76057C003AD5A2 /* LiveKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,7 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				FE09A3242D6346AC00F94248 /* PAI */,
-				FE28BCEF2D6B73F0003AD5A2 /* broadcast */,
+				FE28BDBB2D75CDD4003AD5A2 /* PAICast */,
 				FE09A4362D63935F00F94248 /* Frameworks */,
 				FE09A3232D6346AC00F94248 /* Products */,
 			);
@@ -116,7 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				FE09A3222D6346AC00F94248 /* PAI.app */,
-				FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */,
+				FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,7 +144,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				FE28BCF42D6B73F0003AD5A2 /* PBXTargetDependency */,
+				FE28BDC02D75CDD4003AD5A2 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FE09A3242D6346AC00F94248 /* PAI */,
@@ -158,27 +158,27 @@
 			productReference = FE09A3222D6346AC00F94248 /* PAI.app */;
 			productType = "com.apple.product-type.application";
 		};
-		FE28BCEC2D6B73F0003AD5A2 /* broadcast */ = {
+		FE28BDB82D75CDD4003AD5A2 /* PAICast */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FE28BCF62D6B73F0003AD5A2 /* Build configuration list for PBXNativeTarget "broadcast" */;
+			buildConfigurationList = FE28BDC22D75CDD4003AD5A2 /* Build configuration list for PBXNativeTarget "PAICast" */;
 			buildPhases = (
-				FE28BCE92D6B73F0003AD5A2 /* Sources */,
-				FE28BCEA2D6B73F0003AD5A2 /* Frameworks */,
-				FE28BCEB2D6B73F0003AD5A2 /* Resources */,
+				FE28BDB52D75CDD4003AD5A2 /* Sources */,
+				FE28BDB62D75CDD4003AD5A2 /* Frameworks */,
+				FE28BDB72D75CDD4003AD5A2 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				FE28BCEF2D6B73F0003AD5A2 /* broadcast */,
+				FE28BDBB2D75CDD4003AD5A2 /* PAICast */,
 			);
-			name = broadcast;
+			name = PAICast;
 			packageProductDependencies = (
-				FE28BCFC2D6B76F7003AD5A2 /* LiveKit */,
+				FE28BDC72D76057C003AD5A2 /* LiveKit */,
 			);
-			productName = broadcast;
-			productReference = FE28BCED2D6B73F0003AD5A2 /* broadcast.appex */;
+			productName = PAICast;
+			productReference = FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -194,7 +194,7 @@
 					FE09A3212D6346AC00F94248 = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					FE28BCEC2D6B73F0003AD5A2 = {
+					FE28BDB82D75CDD4003AD5A2 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -218,7 +218,7 @@
 			projectRoot = "";
 			targets = (
 				FE09A3212D6346AC00F94248 /* PAI */,
-				FE28BCEC2D6B73F0003AD5A2 /* broadcast */,
+				FE28BDB82D75CDD4003AD5A2 /* PAICast */,
 			);
 		};
 /* End PBXProject section */
@@ -231,7 +231,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE28BCEB2D6B73F0003AD5A2 /* Resources */ = {
+		FE28BDB72D75CDD4003AD5A2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -248,7 +248,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE28BCE92D6B73F0003AD5A2 /* Sources */ = {
+		FE28BDB52D75CDD4003AD5A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -258,10 +258,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FE28BCF42D6B73F0003AD5A2 /* PBXTargetDependency */ = {
+		FE28BDC02D75CDD4003AD5A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FE28BCEC2D6B73F0003AD5A2 /* broadcast */;
-			targetProxy = FE28BCF32D6B73F0003AD5A2 /* PBXContainerItemProxy */;
+			target = FE28BDB82D75CDD4003AD5A2 /* PAICast */;
+			targetProxy = FE28BDBF2D75CDD4003AD5A2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -270,6 +270,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = BroadcastIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -331,6 +332,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = BroadcastIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -394,6 +396,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PAI/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Access to camera to stream video";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Access to microphone to stream audio";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -438,6 +441,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PAI/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Access to camera to stream video";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Access to microphone to stream audio";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -468,16 +472,16 @@
 			};
 			name = Release;
 		};
-		FE28BCF72D6B73F0003AD5A2 /* Debug */ = {
+		FE28BDC32D75CDD4003AD5A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = broadcast/broadcastRelease.entitlements;
+				CODE_SIGN_ENTITLEMENTS = PAICast/PAICastRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2X2T57M7JB;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = broadcast/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = broadcast;
+				INFOPLIST_FILE = PAICast/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PAI;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -486,6 +490,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI.broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -496,17 +501,16 @@
 			};
 			name = Debug;
 		};
-		FE28BCF82D6B73F0003AD5A2 /* Release */ = {
+		FE28BDC42D75CDD4003AD5A2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = broadcast/broadcastRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = PAICast/PAICastRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2X2T57M7JB;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = broadcast/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = broadcast;
+				INFOPLIST_FILE = PAICast/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PAI;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -517,7 +521,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI.broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -548,11 +551,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FE28BCF62D6B73F0003AD5A2 /* Build configuration list for PBXNativeTarget "broadcast" */ = {
+		FE28BDC22D75CDD4003AD5A2 /* Build configuration list for PBXNativeTarget "PAICast" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FE28BCF72D6B73F0003AD5A2 /* Debug */,
-				FE28BCF82D6B73F0003AD5A2 /* Release */,
+				FE28BDC32D75CDD4003AD5A2 /* Debug */,
+				FE28BDC42D75CDD4003AD5A2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -589,7 +592,7 @@
 			package = FE09A3522D634B3900F94248 /* XCRemoteSwiftPackageReference "components-swift" */;
 			productName = LiveKitComponents;
 		};
-		FE28BCFC2D6B76F7003AD5A2 /* LiveKit */ = {
+		FE28BDC72D76057C003AD5A2 /* LiveKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FE09A34F2D634B0F00F94248 /* XCRemoteSwiftPackageReference "client-sdk-swift" */;
 			productName = LiveKit;

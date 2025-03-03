@@ -306,6 +306,11 @@ struct ContentView: View {
                         }
                     }
                     
+                    // disable tool as the tools stored in state might not be what is available this round
+                    await MainActor.run {
+                        sessionConfigStore.sessionConfig.tools = []
+                    }
+                    
                     sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
                     
                 } else {

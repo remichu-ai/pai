@@ -151,7 +151,7 @@ struct SettingView: View {
                         HStack {
                             Text("Main Server:")
                                 .frame(width: 120, alignment: .leading)  // Adjust width as needed
-                            TextField("http://100.123.119.59:7880", text: $serverUrl)
+                            TextField("", text: $serverUrl)
                                 .autocapitalization(.none)
                                 .disableAutocorrection(true)
                                 .keyboardType(.URL)
@@ -161,7 +161,7 @@ struct SettingView: View {
                         HStack {
                             Text("Authentication:")
                                 .frame(width: 120, alignment: .leading)
-                            TextField("http://100.123.119.59:3111", text: $authenticationUrl)
+                            TextField("", text: $authenticationUrl)
                                 .autocapitalization(.none)
                                 .disableAutocorrection(true)
                                 .keyboardType(.URL)

@@ -16,9 +16,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FE28BCEC2D6B73F0003AD5A2"
-               BuildableName = "broadcast.appex"
-               BlueprintName = "broadcast"
+               BlueprintIdentifier = "FE28BDB82D75CDD4003AD5A2"
+               BuildableName = "PAICast.appex"
+               BlueprintName = "PAICast"
                ReferencedContainer = "container:PAI.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

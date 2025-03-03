@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>RTCAppGroupIdentifier</key>
+	<string>group.gallama.PAI</string>
+	<key>RTCScreenSharingExtension</key>
+	<string>gallama.PAI.broadcast</string>
 	<key>LiveKitSandboxId</key>
 	<string>$(LIVEKIT_SANDBOX_ID)</string>
 	<key>NSAppTransportSecurity</key>
@@ -9,10 +13,6 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>RTCAppGroupIdentifier</key>
-	<string>group.gallama.PAI</string>
-	<key>RTCScreenSharingExtension</key>
-	<string>gallama.PAI.broadcast</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>Audio</string>

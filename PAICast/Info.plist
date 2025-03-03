@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>RTCScreenSharingExtension</key>
+	<string>gallama.PAI.broadcast</string>
+	<key>RTCAppGroupIdentifier</key>
+	<string>group.gallama.PAI</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
@@ -10,8 +14,11 @@
 		<string>$(PRODUCT_MODULE_NAME).SampleHandler</string>
 		<key>RPBroadcastProcessMode</key>
 		<string>RPBroadcastProcessModeSampleBuffer</string>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>RPBroadcastExtensionIcon</key>
+			<string>BroadcastIcon</string>
+		</dict>
 	</dict>
-	<key>RTCAppGroupIdentifier</key>
-	<string>group.gallama.PAI</string>
 </dict>
 </plist>

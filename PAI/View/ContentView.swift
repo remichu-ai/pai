@@ -206,6 +206,22 @@ struct ContentView: View {
             // When hands-free changes, update the session config.
             // (Any additional logic to stop recording should already occur via the popup below.)
             sessionConfigStore.sessionConfig.turnDetection.createResponse = newValue
+            
+            // Turn on microphone if the room is connected.
+            if room.connectionState == .connected {
+                Task {
+                    let captureOptions = AudioCaptureOptions(
+                        echoCancellation: true,
+                        autoGainControl: true,
+                        noiseSuppression: true,
+                        highpassFilter: true
+                    )
+                    // When hands-free is turned on, enable the mic (and vice versa).
+                    try await room.localParticipant.setMicrophone(enabled: newValue, captureOptions: captureOptions)
+                    isAudioEnabled = newValue
+                    isRecording = newValue
+                }
+            }
         }
         .sheet(isPresented: $showingSettings) {
             SettingView(

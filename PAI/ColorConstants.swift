@@ -73,4 +73,26 @@ struct ColorConstants {
             }
         }
     }
+    
+    static func transcriptBackground(_ colorScheme: ColorScheme) -> Color {
+        // A higher-contrast background for the transcript container
+        colorScheme == .dark
+        ? Color.black.opacity(0.8)
+        : Color.white.opacity(0.95)
+    }
+    
+    static func transcriptUserBubble(_ colorScheme: ColorScheme) -> Color {
+        // For user bubbles
+        colorScheme == .dark
+        ? Color.blue.opacity(0.6)
+        : Color.blue.opacity(0.3)
+    }
+    
+    static func transcriptAIBubble(_ colorScheme: ColorScheme) -> Color {
+        // For AI (or “other”) bubbles
+        colorScheme == .dark
+        ? Color.white.opacity(0.1)
+        : Color.gray.opacity(0.2)
+    }
+    
 }

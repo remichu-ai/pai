@@ -95,10 +95,14 @@ struct ContentView: View {
                     }
                     
                     if isTranscriptVisible {
+                        Spacer()
                         TranscriptionView(delegate: transcriptionDelegate)
+                            .padding(.bottom, 16)
+                    } else {
+                        Spacer()
                     }
                     
-                    Spacer()
+                    
                     
                     // Pass down the isRecording binding here.
                     ControlBar(

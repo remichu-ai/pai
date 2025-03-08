@@ -8,17 +8,19 @@ struct TranscriptionView: View {
 
     var body: some View {
         ScrollViewWithProxy()
-            // Add some padding so the container doesn't stick to edges
-            .padding(.horizontal)
-            // Use the color constants with dynamic dark mode support
             .background(
-                ColorConstants.controlBackgroundWithMaterial(colorScheme)
-                    .cornerRadius(24)
-                    .shadow(color: ColorConstants.buttonShadow(colorScheme), radius: 10, x: 0, y: 5)
+                ColorConstants.transcriptBackground(colorScheme)
+                    .cornerRadius(12)
+                    .shadow(
+                        color: colorScheme == .dark
+                            ? .black.opacity(0.5)
+                            : .gray.opacity(0.3),
+                        radius: 6,
+                        x: 0,
+                        y: 4
+                    )
             )
-            // Let the transcript grow, but not beyond 200 points in height
             .frame(maxHeight: 200)
-        
     }
 
     @ViewBuilder
@@ -174,16 +176,15 @@ private struct MessageView: View {
     var body: some View {
         Text(text + (isFinal ? "" : " …"))
             .padding(8)
-            // Use dynamic background colors based on dark/light mode
             .background(
-                isUser ?
-                    (colorScheme == .dark ? Color.blue.opacity(0.3) : Color.blue.opacity(0.2)) :
-                    (colorScheme == .dark ? Color(hex: "2A2A2A") : Color(hex: "F0F0F0"))
+                isUser
+                    ? ColorConstants.transcriptUserBubble(colorScheme)
+                    : ColorConstants.transcriptAIBubble(colorScheme)
             )
             .cornerRadius(8)
+            // For user bubbles in dark mode, we can force white text if needed
+            .foregroundColor(isUser && colorScheme == .dark ? .white : .primary)
             .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
-            // Use primary color which adapts to dark/light mode instead of hardcoded colors
-            .foregroundColor(Color.primary)
     }
 }
 

@@ -4,7 +4,7 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var room: Room
-    private var transcriptionDelegate = TranscriptionDelegate()
+    @EnvironmentObject var transcriptionDelegate: TranscriptionDelegate
     
     @State private var isVideoEnabled: Bool = false
     @State private var isAudioEnabled: Bool = false
@@ -28,10 +28,9 @@ struct ContentView: View {
     // New state for connection loading
     @State private var isConnecting: Bool = false
 
-    init() {
-        let delegate = TranscriptionDelegate()
-        _room = StateObject(wrappedValue: Room(delegate: delegate))
-        self.transcriptionDelegate = delegate
+    // Initialize using an externally provided Room.
+    init(room: Room) {
+        _room = StateObject(wrappedValue: room)
     }
     
     var body: some View {
@@ -322,10 +321,10 @@ struct ContentView: View {
                         }
                     }
                     
-                    // disable tool as the tools stored in state might not be what is available this round
-                    await MainActor.run {
-                        sessionConfigStore.sessionConfig.tools = []
-                    }
+//                    // disable tool as the tools stored in state might not be what is available this round
+//                    await MainActor.run {
+//                        sessionConfigStore.sessionConfig.tools = []
+//                    }
                     
                     sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
                     
@@ -348,11 +347,11 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-        .environmentObject(Room())
-        .environmentObject(SessionConfigStore())
-}
+//#Preview {
+//    ContentView()
+//        .environmentObject(Room())
+//        .environmentObject(SessionConfigStore())
+//}
 
 
 // New HandsFreeView to replace HoldToTalkView
@@ -403,8 +402,8 @@ struct HandsFreeView: View {
     }
 }
 
-#Preview {
-    ContentView()
-        .environmentObject(Room())
-        .environmentObject(SessionConfigStore())
-}
+//#Preview {
+//    ContentView()
+//        .environmentObject(Room())
+//        .environmentObject(SessionConfigStore())
+//}

@@ -1,9 +1,9 @@
 import LiveKit
 import Foundation
 
-func getToolList(room: Room) async throws -> [String] {
+func getToolList(room: Room) async throws -> (allTools: [String], activeTools: [String]) {
     guard let agentIdentity = findAgentIdentity(in: room.remoteParticipants) else {
-        return [] // or handle the error appropriately
+        return ([], [])
     }
     
     let response = try await room.localParticipant.performRpc(
@@ -20,12 +20,32 @@ func getToolList(room: Room) async throws -> [String] {
     
     // Parse the JSON data into a dictionary.
     let responseDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
- 
     
-    // Extract your tool list from the dictionary. For example, if your dictionary has a key "tools":
-    if let tools = responseDict?["tool_list"] as? [String] {
-        return tools
+    // If "tool_list" exists, use it; otherwise assume the root dictionary holds the tool info.
+    let toolListDict: [String: Any]
+    if let nested = responseDict?["tool_list"] as? [String: Any] {
+        toolListDict = nested
+    } else {
+        toolListDict = responseDict ?? [:]
     }
     
-    return []
+    // Parse the "active" tools.
+    var activeTools: [String] = []
+    if let active = toolListDict["active"] as? [String] {
+        activeTools = active
+    } else if let activeStr = toolListDict["active"] as? String, activeStr == "NONE" {
+        activeTools = []
+    }
+    
+    // Parse the "disabled" tools.
+    var disabledTools: [String] = []
+    if let disabled = toolListDict["disabled"] as? [String] {
+        disabledTools = disabled
+    } else if let disabledStr = toolListDict["disabled"] as? String, disabledStr == "NONE" {
+        disabledTools = []
+    }
+    
+    // Combine both lists for a full list of tools.
+    let allTools = Array(Set(activeTools + disabledTools))
+    return (allTools, activeTools)
 }

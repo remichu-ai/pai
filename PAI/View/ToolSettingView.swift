@@ -80,10 +80,10 @@ struct ToolSettingView: View {
             .task {
                 // Fetch the available tools as early as possible.
                 do {
-                    let fetchedTools = try await getToolList(room: room)
-                    availableTools = fetchedTools
-                    // Initialize the custom and selected tools from the current binding.
-                    customSelectedTools = Set(tools)
+                    let fetched = try await getToolList(room: room)
+                    availableTools = fetched.allTools
+                    // Initialize the custom and selected tools with the active tools from the backend.
+                    customSelectedTools = Set(fetched.activeTools)
                     selectedTools = customSelectedTools
                 } catch {
                     print("Failed to fetch tools: \(error)")

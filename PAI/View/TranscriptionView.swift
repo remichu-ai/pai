@@ -18,6 +18,7 @@ struct TranscriptionView: View {
             )
             // Let the transcript grow, but not beyond 200 points in height
             .frame(maxHeight: 200)
+        
     }
 
     @ViewBuilder
@@ -53,6 +54,7 @@ private struct TranscriptionContent: View {
         .padding(.bottom, 8)
         .background(ScrollOffsetReader(userHasScrolledUp: $userHasScrolledUp))
         .onChange(of: segments) { _ in
+            print("Segments updated: \(segments.count) segments received")
             handleSegmentsChange(proxy: proxy)
         }
     }

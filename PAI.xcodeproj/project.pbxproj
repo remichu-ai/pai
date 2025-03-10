@@ -12,6 +12,7 @@
 		FE28BDBA2D75CDD4003AD5A2 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE09A4372D63935F00F94248 /* ReplayKit.framework */; };
 		FE28BDC12D75CDD4003AD5A2 /* PAICast.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FE28BDC82D76057C003AD5A2 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE28BDC72D76057C003AD5A2 /* LiveKit */; };
+		FE2FEAD02D7EEA7100555996 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = FE2FEACF2D7EEA6600555996 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +43,7 @@
 		FE09A3222D6346AC00F94248 /* PAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE09A4372D63935F00F94248 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PAICast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE2FEACF2D7EEA6600555996 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -78,6 +80,11 @@
 			path = PAICast;
 			sourceTree = "<group>";
 		};
+		FE2FEAD12D7EEAB700555996 /* images */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = images;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +112,8 @@
 		FE09A3192D6346AC00F94248 = {
 			isa = PBXGroup;
 			children = (
+				FE2FEACF2D7EEA6600555996 /* README.md */,
+				FE2FEAD12D7EEAB700555996 /* images */,
 				FE09A3242D6346AC00F94248 /* PAI */,
 				FE28BDBB2D75CDD4003AD5A2 /* PAICast */,
 				FE09A4362D63935F00F94248 /* Frameworks */,
@@ -148,6 +157,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				FE09A3242D6346AC00F94248 /* PAI */,
+				FE2FEAD12D7EEAB700555996 /* images */,
 			);
 			name = PAI;
 			packageProductDependencies = (
@@ -228,6 +238,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE2FEAD02D7EEA7100555996 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

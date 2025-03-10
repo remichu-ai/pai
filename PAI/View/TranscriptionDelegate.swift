@@ -18,12 +18,12 @@ class TranscriptionDelegate: NSObject, ObservableObject, RoomDelegate {
                 self.segmentRole[segment.id] = participant.kind == .agent ? "assistant" : "user"
                 
                 // Debug prints
-                print("Segment ID: \(segment.id)")
-                print("Segment Text: \(segment.text)")
-                print("Is Final: \(segment.isFinal)")
-                print("Timestamp: \(segment.firstReceivedTime)")
-                print("Role: \(self.segmentRole[segment.id] ?? "unknown")")
-                print("-------------------")
+//                print("Segment ID: \(segment.id)")
+//                print("Segment Text: \(segment.text)")
+//                print("Is Final: \(segment.isFinal)")
+//                print("Timestamp: \(segment.firstReceivedTime)")
+//                print("Role: \(self.segmentRole[segment.id] ?? "unknown")")
+//                print("-------------------")
             }
         }
     }

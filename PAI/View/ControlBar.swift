@@ -115,7 +115,14 @@ struct ControlBar: View {
                         if isHandsFree {
                             toggleAudio(toggleMode: .toggle)
                         } else {
-                            setRecording(to: !isRecording)
+                            Task {
+                                // Run setRecordStartTime concurrently and ignore its failure.
+                                Task {
+                                    _ = try? await setRecordStartTime(room: room)
+                                }
+                                // Run setRecording concurrently.
+                                setRecording(to: !isRecording)
+                            }
                         }
                     }
                     
@@ -313,6 +320,7 @@ struct ControlBar: View {
     private func disconnect() {
         Task {
             isDisconnecting = true
+            try await clearMessageHistory(room: room)
             await room.disconnect()
             isDisconnecting = false
 

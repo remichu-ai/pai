@@ -40,7 +40,13 @@ struct AdditionalSettingsPopup: View {
                     }
                     
                     // Send updated config to backend
-                    sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                    Task {
+                        do {
+                            try await sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                        } catch {
+                            print("Failed to update session config:", error)
+                        }
+                    }
                 }
             )) {
                 HStack(spacing: 8) {

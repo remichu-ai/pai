@@ -233,7 +233,10 @@ struct ContentView: View {
                 sessionConfig: $sessionConfigStore.sessionConfig
             )
             .onDisappear {
-                sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                Task {
+                    // Call the async throwing version and handle errors (using try? for simplicity).
+                    try? await sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                }
             }
         }
         .sheet(isPresented: $showingToolSettings) {
@@ -269,21 +272,18 @@ struct ContentView: View {
     
     // startConversation function remains the same
     private func startConversation() {
-        // Existing implementation
         if serverUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             showingMissingUrlAlert = true
             return
         }
         
         Task {
-            let roomName = "room-\(Int.random(in: 1000 ... 9999))"
-            let participantName = "user-\(Int.random(in: 1000 ... 9999))"
+            // Indicate connection is starting.
+            await MainActor.run { isConnecting = true }
             
             do {
-                // Set connecting state to true and show loading overlay
-                await MainActor.run {
-                    isConnecting = true
-                }
+                let roomName = "room-\(Int.random(in: 1000 ... 9999))"
+                let participantName = "mobile"
                 
                 if let connectionDetails = try await tokenService.fetchConnectionDetails(
                     roomName: roomName,
@@ -299,7 +299,6 @@ struct ContentView: View {
                         )
                     )
                     
-                    // Get the audio capture options
                     let captureOptions = AudioCaptureOptions(
                         echoCancellation: true,
                         autoGainControl: true,
@@ -307,48 +306,66 @@ struct ContentView: View {
                         highpassFilter: true
                     )
                     
-                    // In both modes, always start the microphone initially
+                    // Start the microphone.
                     try await room.localParticipant.setMicrophone(enabled: true, captureOptions: captureOptions)
-                    await MainActor.run {
-                        isAudioEnabled = true
-                    }
+                    await MainActor.run { isAudioEnabled = true }
                     
-                    // If not in hands-free mode, we need to disable the microphone after 1 second
                     if !isHandsFree {
-                        // Wait for 0.2 second
-                        try await Task.sleep(nanoseconds: 200_000_000)
-                        
-                        // Then disable the microphone
+                        // Wait 0.5 seconds before turning the mic off.
+                        try await Task.sleep(nanoseconds: 500_000_000)
                         try await room.localParticipant.setMicrophone(enabled: false)
-                        await MainActor.run {
-                            isAudioEnabled = false
-                        }
+                        await MainActor.run { isAudioEnabled = false }
                     }
-                    
-//                    // disable tool as the tools stored in state might not be what is available this round
-//                    await MainActor.run {
-//                        sessionConfigStore.sessionConfig.tools = []
-//                    }
-                    
-                    sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
-                    
                 } else {
                     print("Failed to fetch connection details")
                 }
                 
-                // Finally, regardless of the outcome, update the UI state
-                await MainActor.run {
-                    isConnecting = false
-                }
-                
             } catch {
                 print("Connection error: \(error)")
+            }
+            
+            // Reset UI state now that connection logic is complete.
+            await MainActor.run {
+                isConnecting = false
+                sessionConfigStore.sessionConfig.tools = []
+            }
+            
+            Task.detached {
                 await MainActor.run {
-                    isConnecting = false
+                    sessionConfigStore.sessionConfig.tools = []
+                }
+                
+                // Retry logic for sending session config.
+                var sendAttempts = 0
+                while sendAttempts < 3 {
+                    do {
+                        try await sendSessionConfigToBackend(sessionConfigStore.sessionConfig, room: room)
+                        try await setToolList(room: room, toolList: [])
+                        break
+                    } catch {
+                        sendAttempts += 1
+                        print("[Retry] sendSessionConfig attempt \(sendAttempts) of 3, delaying 0.5s due to error: \(error)")
+                        try? await Task.sleep(nanoseconds: 500_000_000)
+                    }
+                }
+
+                // Once sendSessionConfigToBackend completes, retry createInitialResponse.
+                var responseAttempts = 0
+                while responseAttempts < 3 {
+                    let result = try await createInitialResponse(room: room)
+                    if case .success = result {
+                        break
+                    } else {
+                        responseAttempts += 1
+                        print("[Retry] createInitialResponse attempt \(responseAttempts) of 3, delaying 0.5s due to error")
+                        try? await Task.sleep(nanoseconds: 500_000_000)
+                    }
                 }
             }
         }
     }
+
+
 }
 
 //#Preview {

@@ -13,6 +13,7 @@
 		FE28BDC12D75CDD4003AD5A2 /* PAICast.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FE28BDC82D76057C003AD5A2 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE28BDC72D76057C003AD5A2 /* LiveKit */; };
 		FE2FEAD02D7EEA7100555996 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = FE2FEACF2D7EEA6600555996 /* README.md */; };
+		FE8304AB2D858C100003650A /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = FE8304AA2D858C0A0003650A /* PRIVACY.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PAICast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE2FEACF2D7EEA6600555996 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FE8304A72D81DA3A0003650A /* PAI copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PAI copy-Info.plist"; path = "/Users/trantrungduc/Downloads/PAI/PAI copy-Info.plist"; sourceTree = "<absolute>"; };
+		FE8304AA2D858C0A0003650A /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -114,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				FE2FEACF2D7EEA6600555996 /* README.md */,
+				FE8304AA2D858C0A0003650A /* PRIVACY.md */,
 				FE2FEAD12D7EEAB700555996 /* images */,
 				FE09A3242D6346AC00F94248 /* PAI */,
 				FE28BDBB2D75CDD4003AD5A2 /* PAICast */,
@@ -241,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE2FEAD02D7EEA7100555996 /* README.md in Resources */,
+				FE8304AB2D858C100003650A /* PRIVACY.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

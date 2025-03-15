@@ -313,6 +313,15 @@ struct SettingView: View {
                         TextField("Enter token", text: $sessionConfig.userInterruptToken)
                     }
                     
+                    // Currently this feature not working at the backend, and must be set to True
+//                    // Streaming Transcription Toggle
+//                    VStack(alignment: .leading, spacing: 5) {
+//                        Toggle("Enable Live Transcribing", isOn: $sessionConfig.streamingTranscription)
+//                        Text("Process and transcribe user audio as it is received in real-time.")
+//                            .font(.caption)
+//                            .foregroundColor(.gray)
+//                    }
+                    
                     VStack(alignment: .leading, spacing: 5) {
                         Text("Tool Instruction Position")
                         Text("Where tool instructions appear in prompts.")

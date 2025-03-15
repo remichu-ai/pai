@@ -14,7 +14,10 @@ struct SessionConfig: Codable {
     var maxResponseOutputTokens: String = "inf"
     var video: VideoStreamSetting = VideoStreamSetting()
     var model: String?
-    var streamingTranscription: Bool = true
+    
+    // this is a constant cause backend currently not supporting false
+    let streamingTranscription: Bool = true
+    
     var userInterruptToken: String = " <user_interrupt>"
     var inputSampleRate: Int = 24000
     var outputSampleRate: Int = 24000

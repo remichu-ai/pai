@@ -40,10 +40,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FE09A3222D6346AC00F94248 /* PAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE09A3222D6346AC00F94248 /* PAI: Your Personal AI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PAI: Your Personal AI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE09A4372D63935F00F94248 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PAICast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE2FEACF2D7EEA6600555996 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		FE8304A72D81DA3A0003650A /* PAI copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "PAI copy-Info.plist"; path = "/Users/trantrungduc/Downloads/PAI/PAI copy-Info.plist"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -117,6 +118,7 @@
 				FE09A3242D6346AC00F94248 /* PAI */,
 				FE28BDBB2D75CDD4003AD5A2 /* PAICast */,
 				FE09A4362D63935F00F94248 /* Frameworks */,
+				FE8304A72D81DA3A0003650A /* PAI copy-Info.plist */,
 				FE09A3232D6346AC00F94248 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -124,7 +126,7 @@
 		FE09A3232D6346AC00F94248 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FE09A3222D6346AC00F94248 /* PAI.app */,
+				FE09A3222D6346AC00F94248 /* PAI: Your Personal AI.app */,
 				FE28BDB92D75CDD4003AD5A2 /* PAICast.appex */,
 			);
 			name = Products;
@@ -165,7 +167,7 @@
 				FE09A3532D634B3900F94248 /* LiveKitComponents */,
 			);
 			productName = PAI;
-			productReference = FE09A3222D6346AC00F94248 /* PAI.app */;
+			productReference = FE09A3222D6346AC00F94248 /* PAI: Your Personal AI.app */;
 			productType = "com.apple.product-type.application";
 		};
 		FE28BDB82D75CDD4003AD5A2 /* PAICast */ = {
@@ -400,7 +402,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PAI/PAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"PAI/Preview Content\"";
 				DEVELOPMENT_TEAM = 2X2T57M7JB;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -427,7 +429,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "PAI: Your Personal AI";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -445,7 +447,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PAI/PAIRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"PAI/Preview Content\"";
 				DEVELOPMENT_TEAM = 2X2T57M7JB;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -472,7 +474,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = gallama.PAI;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "PAI: Your Personal AI";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

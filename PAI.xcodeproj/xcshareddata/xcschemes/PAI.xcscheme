@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FE09A3212D6346AC00F94248"
-               BuildableName = "PAI.app"
+               BuildableName = "PAI: Your Personal AI.app"
                BlueprintName = "PAI"
                ReferencedContainer = "container:PAI.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FE09A3212D6346AC00F94248"
-            BuildableName = "PAI.app"
+            BuildableName = "PAI: Your Personal AI.app"
             BlueprintName = "PAI"
             ReferencedContainer = "container:PAI.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FE09A3212D6346AC00F94248"
-            BuildableName = "PAI.app"
+            BuildableName = "PAI: Your Personal AI.app"
             BlueprintName = "PAI"
             ReferencedContainer = "container:PAI.xcodeproj">
          </BuildableReference>

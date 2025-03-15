@@ -15,6 +15,7 @@
 	<string>gallama.PAI.broadcast</string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>Audio</string>
 		<string>audio</string>
 		<string>voip</string>
 	</array>

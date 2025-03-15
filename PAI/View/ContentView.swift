@@ -351,7 +351,7 @@ struct ContentView: View {
 
                 // Once sendSessionConfigToBackend completes, retry createInitialResponse.
                 var responseAttempts = 0
-                while responseAttempts < 3 {
+                while responseAttempts < 5 {
                     let result = try await createInitialResponse(room: room)
                     if case .success = result {
                         break

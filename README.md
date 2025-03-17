@@ -25,11 +25,32 @@ The app can be found from App store. To set up the backend needed to run the app
 Following is the guide for the setting inside the PAI app and what you can change:
 
 
-### Home Screen
-<img src="https://github.com/remichu-ai/pai/blob/main/images/Home.PNG" alt="Home" width="330" height="717">
+### Home
+<img src="https://github.com/remichu-ai/pai/blob/main/images/Home.PNG" alt="Home" width="396" height="860.4">
 
 
 - Press the Setting Icon on the top right corner to enter the URL to your backend.
 - Hand-free mode toggle: hand-free mode will automatically detect if you have finished talking and signal to backend to answer
 
-### Setting
+### Basic Setting
+<img src="https://github.com/remichu-ai/pai/blob/main/images/SettingURL.jpeg" alt="Home" width="396" height="860.4">
+
+The most important setting for the app to work is to have the ServerURL and Authentication URL. 
+Please fill in your server IP address similar to the picture with port 7880 (default Livekit port) and port 3111 for authentication.
+The IP address in the picture (10.10.10.10) is just illustration only. As the software is self-hosted, you can must find the IP to access your backend in your local network or your other VPN service.
+
+
+### Voice Chat
+<img src="https://github.com/remichu-ai/pai/blob/main/images/VideoChat.PNG" alt="Home" width="396" height="860.4">
+
+- Button in in the bottom contron bar from left to right: Mute, Video mode, Screen Share, Disconnect
+
+- Touch on the `...` button to toggle Hand-free mode and turn on transcript
+
+
+### Tool Setting
+- If you have any tools configured at the backend, it will appear here.
+- By default when application launch, all tool will be disabled.
+<img src="https://github.com/remichu-ai/pai/blob/main/images/ToolSetting.PNG" alt="Home" width="396" height="860.4">
+
+More setting can be further explored in the Setting Menu.

@@ -26,7 +26,8 @@ Following is the guide for the setting inside the PAI app and what you can chang
 
 
 ### Home Screen
-![Home](https://github.com/remichu-ai/pai/blob/main/images/Home.PNG)
+<img src="https://github.com/remichu-ai/pai/blob/main/images/Home.PNG" alt="Home" width="330" height="717">
+
 
 - Press the Setting Icon on the top right corner to enter the URL to your backend.
 - Hand-free mode toggle: hand-free mode will automatically detect if you have finished talking and signal to backend to answer

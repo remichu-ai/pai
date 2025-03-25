@@ -15,8 +15,7 @@ If you like the project, consider leaving a star.
 - Tools usage
 
 
-Install via TestFlight here
-[TestFlight](https://testflight.apple.com/join/ES3jfr1r)
+Install via TestFlight [here](https://testflight.apple.com/join/ES3jfr1r)
 
 ## Setup
 

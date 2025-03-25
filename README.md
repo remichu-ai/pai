@@ -15,6 +15,9 @@ If you like the project, consider leaving a star.
 - Tools usage
 
 
+Install via TestFlight here
+[TestFlight](https://testflight.apple.com/join/ES3jfr1r)
+
 ## Setup
 
 The app can be found from App store. To set up the backend needed to run the app please refer to this repo [PAI-Agent](https://github.com/remichu-ai/pai-agent.git)

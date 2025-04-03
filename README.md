@@ -10,6 +10,7 @@ If you like the project, consider leaving a star.
 ## Feature
 - Video and Voice chat
 - Hand Free talking
+- Interruptible
 - Transcription
 - Screensharing
 - Tools usage
